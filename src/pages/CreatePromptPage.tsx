@@ -6,6 +6,8 @@ import TagSelector from '../components/TagSelector';
 import VariableEditor from '../components/VariableEditor';
 import { Prompt, Variable } from '../types';
 import analyticsService from '../services/analyticsService';
+import LoadingButton from "../components/LoadingButton.tsx";
+import {useToast} from "../contexts/ToastContext.tsx";
 
 const CreatePromptPage: React.FC = () => {
   const navigate = useNavigate();
@@ -30,6 +32,8 @@ const CreatePromptPage: React.FC = () => {
   const [showCategoryInput, setShowCategoryInput] = useState<boolean>(false);
   const [autoDetectVariables, setAutoDetectVariables] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const { addToast } = useToast();
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   
   // Load prompt data if editing
   useEffect(() => {
@@ -74,6 +78,7 @@ const CreatePromptPage: React.FC = () => {
   
   const handleSave = () => {
     try {
+      setIsSaving(true);
       // Validate form
       if (!title.trim()) {
         setError('Title is required');
@@ -106,9 +111,19 @@ const CreatePromptPage: React.FC = () => {
       // Save prompt
       if (isEditing) {
         updatePromptTemplate(promptData);
+        addToast({
+          type: 'success',
+          message: 'Prompt updated successfully',
+          duration: 3000
+        });
         analyticsService.event('Prompt', 'update_template', promptData.title);
       } else {
         createPromptTemplate(promptData);
+        addToast({
+          type: 'success',
+          message: 'Prompt created successfully',
+          duration: 3000
+        });
         analyticsService.event('Prompt', 'create_template', promptData.title);
       }
       
@@ -117,6 +132,8 @@ const CreatePromptPage: React.FC = () => {
     } catch (err) {
       console.error('Error saving prompt template:', err);
       setError('Failed to save prompt template');
+    } finally {
+      setIsSaving(false);
     }
   };
   
@@ -298,14 +315,15 @@ const CreatePromptPage: React.FC = () => {
           </div>
           
           <div className="flex justify-end">
-            <button
-              type="button"
+            <LoadingButton
+                isLoading={isSaving}
+                loadingText="Saving..."
               onClick={handleSave}
               className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center"
             >
               <Save className="h-4 w-4 mr-2" />
               {isEditing ? ' Save Changes' : 'Create Template'}
-            </button>
+            </LoadingButton>
           </div>
         </div>
       </div>

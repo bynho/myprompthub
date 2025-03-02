@@ -3,7 +3,7 @@ import { Prompt, SavedPrompt, Folder, Variable } from '../types';
 import { loadPrompts, ratePrompt, getUserRating } from '../services/promptService';
 import { v4 as uuidv4 } from 'uuid';
 import analyticsService from '../services/analyticsService';
-import githubService from '../services/githubService';
+import githubService from '../services/secureGithubService';
 import { isSupabaseConfigured } from '../services/supabaseClient';
 
 interface GistSyncResult {

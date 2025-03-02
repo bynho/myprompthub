@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Github, LogOut, AlertCircle, ExternalLink } from 'lucide-react';
-import githubService from '../services/githubService';
+import githubService from '../services/secureGithubService';
 
 interface GitHubLoginProps {
   onLoginSuccess?: () => void;

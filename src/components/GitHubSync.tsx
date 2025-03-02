@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { RefreshCw, AlertCircle, Check, Github, ExternalLink } from 'lucide-react';
 import { usePromptContext } from '../contexts/PromptContext';
-import githubService from '../services/githubService';
+import githubService from '../services/secureGithubService';
 import GitHubLogin from './GitHubLogin';
 
 const GitHubSync: React.FC = () => {
