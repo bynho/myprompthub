@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Search, Save, Github } from 'lucide-react';
 import { usePromptContext } from '../contexts/PromptContext';
 import analyticsService from '../services/analyticsService';
+import GitHubSync from "../components/GitHubSync.tsx";
 
 const HomePage: React.FC = () => {
   const { prompts, savedPrompts } = usePromptContext();
@@ -89,6 +90,8 @@ const HomePage: React.FC = () => {
             </p>
           </div>
         </Link>
+
+
       </div>
     </div>
   );

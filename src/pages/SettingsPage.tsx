@@ -87,10 +87,19 @@ const SettingsPage: React.FC = () => {
               <Database className="h-5 w-5 mr-2 text-blue-500" />
               Supabase Integration
             </h2>
+            <div className="my-4 p-3 bg-yellow-50 text-yellow-800 rounded-md text-sm">
+              <p className="flex items-start">
+                <AlertCircle className="h-4 w-4 mr-2 mt-0.5" />
+                <span>
+                  Your saved prompts / own prompt templates are not stored by us.  They are stored locally on your browser and optionally synced with Github
+                </span>
+              </p>
+            </div>
             <div className="mb-4">
               <p className="text-gray-600 mb-2">
-                Supabase provides cloud storage for prompts and translations.
+                Supabase provides cloud storage for default prompts and translations.
               </p>
+
               <div className="flex items-center mt-4">
                 <span className="text-sm font-medium text-gray-700 mr-2">Supabase Configuration:</span>
                 {isSupabaseEnabled ? (
@@ -155,66 +164,66 @@ const SettingsPage: React.FC = () => {
           </div>
 
           {/* Analytics Settings */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Analytics Settings</h2>
-            <div className="mb-6">
-              <div className="flex items-start mb-4">
-                <div className="flex items-center h-5">
-                  <input
-                      id="ga-analytics"
-                      type="checkbox"
-                      checked={gaEnabled}
-                      onChange={(e) => setGaEnabled(e.target.checked)}
-                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                  />
-                </div>
-                <div className="ml-3 text-sm">
-                  <label htmlFor="ga-analytics" className="font-medium text-gray-700">Google Analytics</label>
-                  <p className="text-gray-500">
-                    Helps us understand how you use the application, which features are popular, and how we can improve your experience.
-                  </p>
-                </div>
-              </div>
+          {/*<div className="bg-white rounded-lg shadow-md p-6">*/}
+          {/*  <h2 className="text-lg font-semibold text-gray-900 mb-4">Analytics Settings</h2>*/}
+          {/*  <div className="mb-6">*/}
+          {/*    <div className="flex items-start mb-4">*/}
+          {/*      <div className="flex items-center h-5">*/}
+          {/*        <input*/}
+          {/*            id="ga-analytics"*/}
+          {/*            type="checkbox"*/}
+          {/*            checked={gaEnabled}*/}
+          {/*            onChange={(e) => setGaEnabled(e.target.checked)}*/}
+          {/*            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"*/}
+          {/*        />*/}
+          {/*      </div>*/}
+          {/*      <div className="ml-3 text-sm">*/}
+          {/*        <label htmlFor="ga-analytics" className="font-medium text-gray-700">Google Analytics</label>*/}
+          {/*        <p className="text-gray-500">*/}
+          {/*          Helps us understand how you use the application, which features are popular, and how we can improve your experience.*/}
+          {/*        </p>*/}
+          {/*      </div>*/}
+          {/*    </div>*/}
 
-              <div className="flex items-start mb-4">
-                <div className="flex items-center h-5">
-                  <input
-                      id="clarity-analytics"
-                      type="checkbox"
-                      checked={clarityEnabled}
-                      onChange={(e) => setClarityEnabled(e.target.checked)}
-                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                  />
-                </div>
-                <div className="ml-3 text-sm">
-                  <label htmlFor="clarity-analytics" className="font-medium text-gray-700">Microsoft Clarity</label>
-                  <p className="text-gray-500">
-                    Provides heatmaps and session recordings to help us understand how you interact with the interface and identify usability issues.
-                  </p>
-                </div>
-              </div>
-            </div>
+          {/*    <div className="flex items-start mb-4">*/}
+          {/*      <div className="flex items-center h-5">*/}
+          {/*        <input*/}
+          {/*            id="clarity-analytics"*/}
+          {/*            type="checkbox"*/}
+          {/*            checked={clarityEnabled}*/}
+          {/*            onChange={(e) => setClarityEnabled(e.target.checked)}*/}
+          {/*            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"*/}
+          {/*        />*/}
+          {/*      </div>*/}
+          {/*      <div className="ml-3 text-sm">*/}
+          {/*        <label htmlFor="clarity-analytics" className="font-medium text-gray-700">Microsoft Clarity</label>*/}
+          {/*        <p className="text-gray-500">*/}
+          {/*          Provides heatmaps and session recordings to help us understand how you interact with the interface and identify usability issues.*/}
+          {/*        </p>*/}
+          {/*      </div>*/}
+          {/*    </div>*/}
+          {/*  </div>*/}
 
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-500">
-                <AlertCircle className="h-4 w-4 inline mr-1" />
-                Changes will take effect after saving and refreshing the page.
-              </div>
-              <button
-                  onClick={handleSaveAnalytics}
-                  className="btn btn-primary flex items-center"
-              >
-                <Save className="h-4 w-4 mr-1" />
-                Save Preferences
-              </button>
-            </div>
+          {/*  <div className="flex items-center justify-between">*/}
+          {/*    <div className="text-sm text-gray-500">*/}
+          {/*      <AlertCircle className="h-4 w-4 inline mr-1" />*/}
+          {/*      Changes will take effect after saving and refreshing the page.*/}
+          {/*    </div>*/}
+          {/*    <button*/}
+          {/*        onClick={handleSaveAnalytics}*/}
+          {/*        className="btn btn-primary flex items-center"*/}
+          {/*    >*/}
+          {/*      <Save className="h-4 w-4 mr-1" />*/}
+          {/*      Save Preferences*/}
+          {/*    </button>*/}
+          {/*  </div>*/}
 
-            {saved && (
-                <div className="mt-4 p-2 bg-green-100 text-green-800 rounded-md text-sm">
-                  Settings saved successfully!
-                </div>
-            )}
-          </div>
+          {/*  {saved && (*/}
+          {/*      <div className="mt-4 p-2 bg-green-100 text-green-800 rounded-md text-sm">*/}
+          {/*        Settings saved successfully!*/}
+          {/*      </div>*/}
+          {/*  )}*/}
+          {/*</div>*/}
         </div>
       </div>
   );

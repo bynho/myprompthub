@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Github, LogOut, AlertCircle, ExternalLink } from 'lucide-react';
+import { LogOut, AlertCircle, ExternalLink } from 'lucide-react';
 import githubService from '../services/secureGithubService';
+import {SiGithub} from "@icons-pack/react-simple-icons";
 
 interface GitHubLoginProps {
   onLoginSuccess?: () => void;
@@ -52,17 +53,13 @@ const GitHubLogin: React.FC<GitHubLoginProps> = ({ onLoginSuccess, onLogout }) =
 
   if (isLoggedIn) {
     return (
-      <div className="flex flex-col space-y-2">
-        <div className="flex items-center text-sm text-green-600">
-          <Github className="h-4 w-4 mr-1" />
-          <span>Connected to GitHub</span>
-        </div>
+      <div className="flex flex-row items-center space-x-2">
         <button
           onClick={handleLogout}
           className="flex items-center px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50"
         >
-          <LogOut className="h-4 w-4 mr-2" />
-          Logout from GitHub
+          <SiGithub className="h-4 w-4 mr-2" />
+          Logout
         </button>
       </div>
     );
@@ -75,7 +72,8 @@ const GitHubLogin: React.FC<GitHubLoginProps> = ({ onLoginSuccess, onLogout }) =
           onClick={() => setShowTokenInput(true)}
           className="flex items-center px-3 py-2 text-sm bg-gray-800 text-white rounded-md hover:bg-gray-700"
         >
-          <Github className="h-4 w-4 mr-2" />
+
+          <SiGithub className="h-4 w-4 mr-2" />
           Login with GitHub
         </button>
       ) : (
@@ -136,9 +134,9 @@ const GitHubLogin: React.FC<GitHubLoginProps> = ({ onLoginSuccess, onLogout }) =
               {loading ? (
                 <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></span>
               ) : (
-                <Github className="h-4 w-4 mr-2" />
+                <SiGithub className="h-4 w-4 mr-2" />
               )}
-              Login with GitHub
+              Login
             </button>
           </div>
         </div>
