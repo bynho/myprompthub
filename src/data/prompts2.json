@@ -1,0 +1,241 @@
+{
+  "prompts": [
+    {
+      "id": "literature-review",
+      "title": "Literature Review Framework",
+      "category": "Academic Research",
+      "description": "Generate a structured framework for conducting a literature review in a specific field",
+      "content": "I need to conduct a comprehensive literature review on {research_topic} within the field of {field_of_study}. Please provide a structured framework that includes:\n\n1. Key search terms and boolean operators to use\n2. Recommended academic databases for this field\n3. Criteria for inclusion and exclusion of papers\n4. A template for organizing findings (themes, methodologies, gaps)\n5. Strategies for critically analyzing the selected papers\n6. Approaches for synthesizing findings across multiple papers\n7. Common pitfalls to avoid when conducting a literature review in this field\n\nMy review needs to cover literature from the past {time_period} years and should focus particularly on {specific_aspect} of the topic.",
+      "variables": [
+        {
+          "id": "research_topic",
+          "name": "Research Topic",
+          "description": "The specific research topic you're investigating",
+          "type": "text",
+          "placeholder": "e.g., Machine Learning in Healthcare"
+        },
+        {
+          "id": "field_of_study",
+          "name": "Field of Study",
+          "description": "The broader academic discipline",
+          "type": "text",
+          "placeholder": "e.g., Computer Science, Psychology, Economics"
+        },
+        {
+          "id": "time_period",
+          "name": "Time Period",
+          "description": "How many years back the review should cover",
+          "type": "text",
+          "placeholder": "e.g., 5, 10, 20"
+        },
+        {
+          "id": "specific_aspect",
+          "name": "Specific Aspect",
+          "description": "A particular aspect or dimension of the topic to focus on",
+          "type": "textarea",
+          "placeholder": "e.g., ethical implications, methodological approaches, practical applications"
+        }
+      ],
+      "tags": ["academic", "research", "literature review", "methodology"],
+      "createdAt": "2025-01-15"
+    },
+    {
+      "id": "research-question",
+      "title": "Research Question Formulation",
+      "category": "Academic Research",
+      "description": "Develop well-structured research questions for your study",
+      "content": "I'm designing a research study on {research_topic} within the field of {field_of_study}. My research aims to {research_aim}.\n\nPlease help me formulate 3-5 well-structured research questions that:\n\n1. Address gaps in the current literature\n2. Are specific, measurable, achievable, relevant, and time-bound (SMART)\n3. Align with {research_methodology} methodology\n4. Consider ethical implications and constraints\n5. Build upon existing theoretical frameworks in this field\n\nFor each research question, please provide:\n- The question itself\n- Rationale for its importance\n- Potential challenges in answering it\n- Suggestions for operationalizing key variables",
+      "variables": [
+        {
+          "id": "research_topic",
+          "name": "Research Topic",
+          "description": "The specific research topic you're investigating",
+          "type": "text",
+          "placeholder": "e.g., The impact of social media on adolescent mental health"
+        },
+        {
+          "id": "field_of_study",
+          "name": "Field of Study",
+          "description": "The broader academic discipline",
+          "type": "text",
+          "placeholder": "e.g., Psychology, Sociology, Public Health"
+        },
+        {
+          "id": "research_aim",
+          "name": "Research Aim",
+          "description": "The overall purpose or objective of your research",
+          "type": "textarea",
+          "placeholder": "e.g., understand how daily social media usage patterns correlate with anxiety and depression symptoms in teenagers aged 13-18"
+        },
+        {
+          "id": "research_methodology",
+          "name": "Research Methodology",
+          "description": "The primary research approach you plan to use",
+          "type": "text",
+          "placeholder": "e.g., qualitative, quantitative, mixed methods"
+        }
+      ],
+      "tags": ["academic", "research", "research questions", "methodology"],
+      "createdAt": "2025-01-20"
+    },
+    {
+      "id": "methodology-design",
+      "title": "Research Methodology Design",
+      "category": "Academic Research",
+      "description": "Create a comprehensive research methodology for your study",
+      "content": "I'm conducting research on {research_topic} and need to design a comprehensive methodology. My research question is: {research_question}\n\nPlease help me develop a detailed research methodology that includes:\n\n1. Research approach justification ({research_approach})\n2. Data collection methods appropriate for this study\n3. Sampling strategy and sample size considerations\n4. Data analysis techniques\n5. Validity and reliability measures\n6. Ethical considerations specific to this research\n7. Limitations and potential biases to address\n8. Timeline for implementation\n\nThe study will be conducted in {research_setting} with {participant_description} as participants.",
+      "variables": [
+        {
+          "id": "research_topic",
+          "name": "Research Topic",
+          "description": "The specific research topic you're investigating",
+          "type": "text",
+          "placeholder": "e.g., The effectiveness of mindfulness interventions in reducing workplace stress"
+        },
+        {
+          "id": "research_question",
+          "name": "Research Question",
+          "description": "Your primary research question",
+          "type": "textarea",
+          "placeholder": "e.g., To what extent do 8-week mindfulness programs reduce self-reported stress levels among corporate employees?"
+        },
+        {
+          "id": "research_approach",
+          "name": "Research Approach",
+          "description": "The primary research approach you plan to use",
+          "type": "text",
+          "placeholder": "e.g., mixed methods, experimental design, case study"
+        },
+        {
+          "id": "research_setting",
+          "name": "Research Setting",
+          "description": "The context or environment where the research will take place",
+          "type": "text",
+          "placeholder": "e.g., corporate offices in urban settings, university laboratory, online"
+        },
+        {
+          "id": "participant_description",
+          "name": "Participant Description",
+          "description": "Brief description of your research participants",
+          "type": "textarea",
+          "placeholder": "e.g., full-time employees aged 25-55 working in high-stress corporate environments"
+        }
+      ],
+      "tags": ["academic", "research", "methodology", "research design"],
+      "createdAt": "2025-01-25"
+    },
+    {
+      "id": "data-analysis-plan",
+      "title": "Data Analysis Plan",
+      "category": "Data Analysis",
+      "description": "Develop a comprehensive plan for analyzing research data",
+      "content": "I've collected {data_type} data for my research on {research_topic} and need to develop a comprehensive data analysis plan. The data includes {data_description}.\n\nPlease help me create a detailed data analysis plan that includes:\n\n1. Data preparation steps (cleaning, normalization, handling missing values)\n2. Appropriate statistical tests or analytical methods for {research_question}\n3. Justification for chosen analytical approaches\n4. Software recommendations (preferably {preferred_software})\n5. Step-by-step analysis procedure\n6. Interpretation guidelines for results\n7. Visualization recommendations for key findings\n8. Potential limitations and how to address them\n\nMy analysis needs to account for {specific_considerations}.",
+      "variables": [
+        {
+          "id": "data_type",
+          "name": "Data Type",
+          "description": "The type of data you've collected",
+          "type": "text",
+          "placeholder": "e.g., quantitative survey, qualitative interview, mixed methods"
+        },
+        {
+          "id": "research_topic",
+          "name": "Research Topic",
+          "description": "The specific research topic you're investigating",
+          "type": "text",
+          "placeholder": "e.g., Consumer behavior in sustainable product purchasing"
+        },
+        {
+          "id": "data_description",
+          "name": "Data Description",
+          "description": "Brief description of your dataset",
+          "type": "textarea",
+          "placeholder": "e.g., survey responses from 500 participants with 25 Likert-scale items and 5 demographic variables"
+        },
+        {
+          "id": "research_question",
+          "name": "Research Question",
+          "description": "Your primary research question",
+          "type": "textarea",
+          "placeholder": "e.g., What factors most strongly predict sustainable product purchasing behavior among millennials?"
+        },
+        {
+          "id": "preferred_software",
+          "name": "Preferred Software",
+          "description": "Software you prefer to use for analysis",
+          "type": "text",
+          "placeholder": "e.g., R, SPSS, Python, NVivo"
+        },
+        {
+          "id": "specific_considerations",
+          "name": "Specific Considerations",
+          "description": "Any specific factors that need to be considered in your analysis",
+          "type": "textarea",
+          "placeholder": "e.g., nested data structure, non-normal distribution, small sample size in certain subgroups"
+        }
+      ],
+      "tags": ["data analysis", "statistics", "research", "methodology"],
+      "createdAt": "2025-02-01"
+    },
+    {
+      "id": "literature-synthesis",
+      "title": "Literature Synthesis Framework",
+      "category": "Academic Writing",
+      "description": "Create a framework for synthesizing literature on a specific topic",
+      "content": "I need to synthesize literature on {research_topic} within the field of {field_of_study}. I've reviewed approximately {number_of_sources} sources published between {start_year} and {end_year}.\n\nPlease provide a framework for synthesizing this literature that includes:\n\n1. Approaches for identifying key themes, patterns, and contradictions\n2. Methods for comparing and contrasting methodologies across studies\n3. Strategies for evaluating the quality and relevance of different sources\n4. Techniques for identifying gaps and future research directions\n5. Approaches for integrating theoretical perspectives\n6. Structure for presenting the synthesis (chronological, thematic, methodological)\n7. Guidelines for maintaining objectivity and avoiding bias\n\nThe synthesis will focus particularly on {specific_focus} and will be used for {intended_purpose}.",
+      "variables": [
+        {
+          "id": "research_topic",
+          "name": "Research Topic",
+          "description": "The specific research topic you're investigating",
+          "type": "text",
+          "placeholder": "e.g., The impact of artificial intelligence on employment"
+        },
+        {
+          "id": "field_of_study",
+          "name": "Field of Study",
+          "description": "The broader academic discipline",
+          "type": "text",
+          "placeholder": "e.g., Economics, Computer Science, Sociology"
+        },
+        {
+          "id": "number_of_sources",
+          "name": "Number of Sources",
+          "description": "Approximate number of sources reviewed",
+          "type": "text",
+          "placeholder": "e.g., 30, 50, 100"
+        },
+        {
+          "id": "start_year",
+          "name": "Start Year",
+          "description": "The earliest publication year in your review",
+          "type": "text",
+          "placeholder": "e.g., 2010"
+        },
+        {
+          "id": "end_year",
+          "name": "End Year",
+          "description": "The most recent publication year in your review",
+          "type": "text",
+          "placeholder": "e.g., 2025"
+        },
+        {
+          "id": "specific_focus",
+          "name": "Specific Focus",
+          "description": "The particular aspect of the topic you're focusing on",
+          "type": "textarea",
+          "placeholder": "e.g., methodological approaches, theoretical frameworks, empirical findings"
+        },
+        {
+          "id": "intended_purpose",
+          "name": "Intended Purpose",
+          "description": "How you plan to use this literature synthesis",
+          "type": "text",
+          "placeholder": "e.g., dissertation literature review, journal article, research proposal"
+        }
+      ],
+      "tags": ["literature review", "synthesis", "academic writing", "research"],
+      "createdAt": "2025-02-05"
+    }
+  ]
+}
