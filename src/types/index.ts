@@ -7,6 +7,11 @@ export interface Variable {
   options?: string[]; // For select type
 }
 
+export enum PromptType {
+  SYSTEM_TEMPLATE = 'system-template',
+  LOCAL_TEMPLATE = 'local-template',
+  LOCAL = 'local',
+}
 export interface Prompt {
   id: string;
   slug?: string; // URL-friendly identifier
@@ -17,16 +22,18 @@ export interface Prompt {
   variables: Variable[];
   tags: string[];
   createdAt: string;
-  isCustom?: boolean;
+  type?: PromptType;
   positiveRatings?: number;
   negativeRatings?: number;
   userRating?: boolean | null; // true for positive, false for negative, null for no rating
-}
-
-export interface SavedPrompt extends Prompt {
-  originalPromptId: string;
+  originalPromptId?: string;
   folder?: string;
 }
+
+// export interface SavedPrompt extends Prompt {
+//   originalPromptId: string;
+//   folder?: string;
+// }
 // export interface SavedPrompt {
 //   id: string;
 //   originalPromptId: string;

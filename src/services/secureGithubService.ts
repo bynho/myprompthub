@@ -1,10 +1,10 @@
 import {Octokit} from 'octokit';
-import {Folder, Prompt, SavedPrompt} from '../types';
+import {Folder, Prompt} from '../types';
 import secureStorageService from './secureStorageService';
 import errorService from './errorService';
 
 interface GistContent {
-    savedPrompts: SavedPrompt[];
+    savedPrompts: Prompt[];
     customPrompts: Prompt[];
     folders: Folder[];
     lastSynced: string;
@@ -282,7 +282,7 @@ class GitHubService {
      * Sync data with GitHub
      */
     async syncData(
-        savedPrompts: SavedPrompt[],
+        savedPrompts: Prompt[],
         customPrompts: Prompt[],
         folders: Folder[]
     ): Promise<GistContent> {

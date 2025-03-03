@@ -1,23 +1,16 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
-import {
-    ArrowLeft,
-    Copy,
-    Edit,
-    Folder,
-    Save,
-    Tag,
-    Trash,
-} from 'lucide-react';
+import {ArrowLeft, Copy, Edit, Folder, Save, Tag, Trash,} from 'lucide-react';
 import {usePromptContext} from '../contexts/PromptContext';
 import TagSelector from '../components/TagSelector';
 import FolderSelector from '../components/FolderSelector';
 import VariableInput from '../components/VariableInput';
 import PromptRating from '../components/PromptRating';
 import analyticsService from '../services/analyticsService';
-import {Prompt, Variable} from "../types";
+import {Prompt, PromptType, Variable} from "../types";
 import Button from "../components/Button.tsx";
 import {v4 as uuidv4} from "uuid";
+import {useToast} from "../contexts/ToastContext.tsx";
 
 const PromptDetailPage: React.FC = () => {
     const {id} = useParams<{ id: string }>();
@@ -25,7 +18,6 @@ const PromptDetailPage: React.FC = () => {
     const {
         prompts,
         deletePromptTemplate,
-        savedPrompts,
         savePrompt,
         copyToClipboard,
         tags
@@ -37,13 +29,13 @@ const PromptDetailPage: React.FC = () => {
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [selectedFolder, setSelectedFolder] = useState<string | undefined>(undefined);
     const [isSaved, setIsSaved] = useState<boolean>(false);
+    const {addToast} = useToast();
 
     // Find the prompt by ID
     useEffect(() => {
         if (id && prompts.length > 0) {
             const foundPrompt = prompts.find(p => p.id === id);
             if (foundPrompt) {
-                console.warn('Prompt found:', foundPrompt);
                 setPrompt(foundPrompt);
 
                 // Initialize variable values
@@ -61,19 +53,6 @@ const PromptDetailPage: React.FC = () => {
         }
     }, [id, prompts, navigate]);
 
-    // Check if this prompt is already saved
-    useEffect(() => {
-        if (id && savedPrompts.length > 0) {
-            const savedPrompt = savedPrompts.find(p => p.originalPromptId === id);
-            if (savedPrompt) {
-                setIsSaved(true);
-                setSelectedTags(savedPrompt.tags || []);
-                setSelectedFolder(savedPrompt.folder);
-            } else {
-                setIsSaved(false);
-            }
-        }
-    }, [id, savedPrompts]);
 
     // Generate content when variable values change
     useEffect(() => {
@@ -114,6 +93,8 @@ const PromptDetailPage: React.FC = () => {
 
             setIsSaved(true);
 
+            addToast({message: 'Prompt saved successfully', type: 'success'});
+
             // Track save event
             analyticsService.trackPromptInteraction('save', prompt.id, prompt.title);
         }
@@ -150,7 +131,7 @@ const PromptDetailPage: React.FC = () => {
     };
 
     const handleEditTemplate = () => {
-        if (prompt && prompt.isCustom) {
+        if (prompt) {
             navigate(`/create/${prompt.id}`);
         }
     };
@@ -193,7 +174,7 @@ const PromptDetailPage: React.FC = () => {
                         <p className="text-gray-600 mb-6">{prompt.description}</p>
                     </div>
 
-                    {prompt.isCustom && (
+                    {prompt.type === PromptType.LOCAL_TEMPLATE && (
                         <button
                             onClick={handleEditTemplate}
                             className="px-3 py-1 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center"
@@ -264,7 +245,7 @@ const PromptDetailPage: React.FC = () => {
 
                     <div className="flex justify-end gap-3">
                         {
-                            prompt.isCustom === true && (
+                            prompt.type === PromptType.LOCAL_TEMPLATE && (
                                 <Button onClick={handleDeleteItem}
                                         variant={'danger'}
                                         icon={<Trash className="h-4 w-4 mx-1"/>}>
@@ -277,13 +258,17 @@ const PromptDetailPage: React.FC = () => {
                             icon={<Copy className="h-4 w-4 mx-1"/>}>
                             Copy
                         </Button>
-                        <Button
-                            onClick={handleSave}
-                            variant={'primary'}
-                            disabled={isSaved}
-                            icon={<Save className="h-4 w-4 mx-2"/>}>
-                            {isSaved ? 'Saved' : 'Save'}
-                        </Button>
+                        {
+                            !isSaved && (
+                                <Button
+                                    onClick={handleSave}
+                                    variant={'primary'}
+                                    icon={<Save className="h-4 w-4 mx-2"/>}>
+                                    {isSaved ? 'Saved' : 'Save'}
+                                </Button>
+                            )
+                        }
+
                     </div>
                 </div>
             </div>

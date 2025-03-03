@@ -1,12 +1,12 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 import {Calendar, Copy, Edit, Folder, Tag, Trash} from 'lucide-react';
-import {SavedPrompt} from '../types';
+import {Prompt} from '../types';
 import {usePromptContext} from '../contexts/PromptContext';
 import analyticsService from '../services/analyticsService';
 
 interface SavedPromptCardProps {
-    prompt: SavedPrompt;
+    prompt: Prompt;
 }
 
 const SavedPromptCard: React.FC<SavedPromptCardProps> = ({prompt}) => {

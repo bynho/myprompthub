@@ -4,6 +4,7 @@ import {usePromptContext} from '../contexts/PromptContext';
 import githubService from '../services/secureGithubService';
 import GitHubLogin from './GitHubLogin';
 import {useToast} from "../contexts/ToastContext.tsx";
+import {PromptType} from "../types";
 
 interface GitHubSyncProps {
     hideInfo?: boolean
@@ -71,7 +72,7 @@ const GitHubSync: React.FC<GitHubSyncProps> = ({
 
         try {
             // Get custom prompts (filter out built-in prompts)
-            const customPrompts = prompts.filter(p => p.isCustom);
+            const customPrompts = prompts.filter(p => p.type === PromptType.LOCAL_TEMPLATE);
 
             // Export data to GitHub
             const result = await exportToGitHub(savedPrompts, customPrompts, folders);

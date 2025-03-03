@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tag, Calendar, Edit, ThumbsUp, ThumbsDown } from 'lucide-react';
-import { Prompt } from '../types';
+import {Prompt, PromptType} from '../types';
 import analyticsService from '../services/analyticsService';
 
 interface PromptCardProps {
@@ -35,11 +35,11 @@ const PromptCard: React.FC<PromptCardProps> = ({ prompt }) => {
         <div className="flex justify-between items-start mb-3">
           <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">{prompt.title}</h3>
           <div className="flex items-center">
-            {prompt.isCustom && (
+
               <span className="px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded-full mr-2">
-                Custom
+                {prompt.type ===  PromptType.LOCAL ? 'Local' : prompt.type === PromptType.LOCAL_TEMPLATE ? 'Local Template' : 'System Template' }
               </span>
-            )}
+
             <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
               {prompt.category}
             </span>
@@ -52,7 +52,7 @@ const PromptCard: React.FC<PromptCardProps> = ({ prompt }) => {
           <Calendar className="h-4 w-4 mr-1" />
           <span>{new Date(prompt.createdAt).toLocaleDateString()}</span>
           
-          {prompt.isCustom && (
+          {prompt.type === PromptType.LOCAL_TEMPLATE && (
             <div className="ml-auto">
               <button 
                 onClick={handleEditClick}

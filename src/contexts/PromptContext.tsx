@@ -1,10 +1,10 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { Prompt, SavedPrompt, Folder, Variable } from '../types';
-import { loadPrompts, ratePrompt, getUserRating } from '../services/promptService';
-import { v4 as uuidv4 } from 'uuid';
+import React, {createContext, ReactNode, useContext, useEffect, useState} from 'react';
+import {Folder, Prompt, PromptType, Variable} from '../types';
+import {getUserRating, loadPrompts, ratePrompt} from '../services/promptService';
+import {v4 as uuidv4} from 'uuid';
 import analyticsService from '../services/analyticsService';
 import githubService from '../services/secureGithubService';
-import { isSupabaseConfigured } from '../services/supabaseClient';
+import {isSupabaseConfigured} from '../services/supabaseClient';
 
 interface GistSyncResult {
   lastSynced: string;
@@ -12,13 +12,13 @@ interface GistSyncResult {
 
 interface PromptContextType {
   prompts: Prompt[];
-  savedPrompts: SavedPrompt[];
+  savedPrompts: Prompt[];
   folders: Folder[];
   loading: boolean;
   error: string | null;
-  savePrompt: (prompt: SavedPrompt) => void;
+  savePrompt: (prompt: Prompt) => void;
   removeSavedPrompt: (id: string) => void;
-  updatePrompt: (prompt: SavedPrompt) => void;
+  updatePrompt: (prompt: Prompt) => void;
   createFolder: (name: string) => void;
   deleteFolder: (id: string) => void;
   movePromptToFolder: (promptId: string, folderId: string | undefined) => void;
@@ -30,7 +30,7 @@ interface PromptContextType {
   updatePromptTemplate: (prompt: Prompt) => void;
   deletePromptTemplate: (id: string) => void;
   extractVariablesFromContent: (content: string) => Variable[];
-  exportToGitHub: (savedPrompts: SavedPrompt[], customPrompts: Prompt[], folders: Folder[]) => Promise<GistSyncResult>;
+  exportToGitHub: (savedPrompts: Prompt[], customPrompts: Prompt[], folders: Folder[]) => Promise<GistSyncResult>;
   importFromGitHub: () => Promise<GistSyncResult | null>;
   ratePrompt: (promptId: string, rating: boolean) => Promise<void>;
   isSupabaseEnabled: boolean;
@@ -41,7 +41,7 @@ const PromptContext = createContext<PromptContextType | undefined>(undefined);
 
 export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [prompts, setPrompts] = useState<Prompt[]>([]);
-  const [savedPrompts, setSavedPrompts] = useState<SavedPrompt[]>([]);
+  const [savedPrompts, setSavedPrompts] = useState<Prompt[]>([]);
   const [folders, setFolders] = useState<Folder[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -81,7 +81,7 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       if (savedPromptsJson) {
         setSavedPrompts(JSON.parse(savedPromptsJson));
       }
-      
+
       // Load folders from local storage
       const foldersJson = localStorage.getItem('folders');
       if (foldersJson) {
@@ -200,7 +200,7 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       }
       
       // Save custom prompts to localStorage
-      const customPrompts = prompts.filter(p => p.isCustom).concat(newPrompt);
+      const customPrompts = prompts.filter(p => p.type === PromptType.LOCAL_TEMPLATE).concat(newPrompt);
       localStorage.setItem('custom-prompts', JSON.stringify(customPrompts));
       
       analyticsService.event('Prompt', 'create_template', newPrompt.title);
@@ -234,8 +234,8 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       
       // Save custom prompts to localStorage
       const customPrompts = prompts
-        .filter(p => p.isCustom && p.id !== prompt.id)
-        .concat({ ...prompt, isCustom: true });
+        .filter(p => p.type === PromptType.LOCAL_TEMPLATE && p.id !== prompt.id);
+
       localStorage.setItem('custom-prompts', JSON.stringify(customPrompts));
       
       analyticsService.event('Prompt', 'update_template', prompt.title);
@@ -250,17 +250,17 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const deletePromptTemplate = (id: string) => {
     try {
       const promptToDelete = prompts.find(p => p.id === id);
-      if (!promptToDelete?.isCustom) {
-        throw new Error('Cannot delete built-in prompt templates');
+      if (promptToDelete?.type === PromptType.SYSTEM_TEMPLATE) {
+        throw new Error('Cannot delete system prompt templates');
       }
       
       setPrompts(prevPrompts => prevPrompts.filter(p => p.id !== id));
       
       // Save custom prompts to localStorage
-      const customPrompts = prompts.filter(p => p.isCustom && p.id !== id);
+      const customPrompts = prompts.filter(p => p.type === PromptType.LOCAL_TEMPLATE && p.id !== id);
       localStorage.setItem('custom-prompts', JSON.stringify(customPrompts));
       
-      analyticsService.event('Prompt', 'delete_template', promptToDelete.title);
+      analyticsService.event('Prompt', 'delete_template', promptToDelete?.title);
     } catch (err) {
       setError('Failed to delete prompt template');
       console.error('Error deleting prompt template:', err);
@@ -269,11 +269,12 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   };
 
   // Save a prompt
-  const savePrompt = (prompt: SavedPrompt) => {
+  const savePrompt = (prompt: Prompt) => {
     try {
       const newPrompt = {
         ...prompt,
         id: prompt.id || `saved-${uuidv4()}`,
+        type: PromptType.LOCAL,
         savedAt: new Date().toISOString()
       };
       
@@ -309,7 +310,7 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   };
 
   // Update a saved prompt
-  const updatePrompt = (prompt: SavedPrompt) => {
+  const updatePrompt = (prompt: Prompt) => {
     try {
       setSavedPrompts(prevPrompts => 
         prevPrompts.map(p => p.id === prompt.id ? prompt : p)
@@ -416,7 +417,7 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
   // Export data to GitHub Gist
   const exportToGitHub = async (
-    savedPrompts: SavedPrompt[],
+    savedPrompts: Prompt[],
     customPrompts: Prompt[],
     folders: Folder[]
   ): Promise<GistSyncResult> => {
@@ -459,7 +460,7 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       
       if (gistContent.customPrompts) {
         // Merge custom prompts with built-in prompts
-        const builtInPrompts = prompts.filter(p => !p.isCustom);
+        const builtInPrompts = prompts.filter(p => p.type === PromptType.SYSTEM_TEMPLATE);
         setPrompts([...builtInPrompts, ...gistContent.customPrompts]);
         
         // Save custom prompts to localStorage

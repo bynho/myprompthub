@@ -1,4 +1,4 @@
-import { SavedPrompt } from '../types';
+import { Prompt } from '../types';
 
 // Copy text to clipboard
 export const copyToClipboard = async (text: string): Promise<boolean> => {
@@ -12,12 +12,12 @@ export const copyToClipboard = async (text: string): Promise<boolean> => {
 };
 
 // Export a single prompt as JSON
-export const exportPromptAsJson = (prompt: SavedPrompt): string => {
+export const exportPromptAsJson = (prompt: Prompt): string => {
   return JSON.stringify(prompt, null, 2);
 };
 
 // Export multiple prompts as JSON
-export const exportPromptsAsJson = (prompts: SavedPrompt[]): string => {
+export const exportPromptsAsJson = (prompts: Prompt[]): string => {
   return JSON.stringify(prompts, null, 2);
 };
 
@@ -35,12 +35,12 @@ export const downloadAsFile = (content: string, filename: string, contentType: s
 };
 
 // Export prompt as text file
-export const exportPromptAsText = (prompt: SavedPrompt): string => {
+export const exportPromptAsText = (prompt: Prompt): string => {
   return `# ${prompt.title}\n\n${prompt.description}\n\n${prompt.content}`;
 };
 
 // Export prompts as markdown
-export const exportPromptsAsMarkdown = (prompts: SavedPrompt[]): string => {
+export const exportPromptsAsMarkdown = (prompts: Prompt[]): string => {
   return prompts.map(prompt => {
     return `# ${prompt.title}\n\n${prompt.description}\n\n${prompt.content}\n\n---\n\n`;
   }).join('');
