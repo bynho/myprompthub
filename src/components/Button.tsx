@@ -1,7 +1,7 @@
 import React, { ButtonHTMLAttributes, ReactNode } from 'react';
 import { Loader } from 'lucide-react';
 
-interface LoadingButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface Button extends ButtonHTMLAttributes<HTMLButtonElement> {
     children: ReactNode;
     isLoading?: boolean;
     loadingText?: string;
@@ -10,7 +10,7 @@ interface LoadingButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     size?: 'sm' | 'md' | 'lg';
 }
 
-const LoadingButton: React.FC<LoadingButtonProps> = ({
+const Button: React.FC<Button> = ({
                                                          children,
                                                          isLoading = false,
                                                          loadingText,
@@ -42,7 +42,7 @@ const LoadingButton: React.FC<LoadingButtonProps> = ({
         inline-flex items-center justify-center border rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors
         ${sizeClasses[size]}
         ${variantClasses[variant]}
-        ${isLoading ? 'opacity-90 cursor-not-allowed' : ''}
+        ${disabled || isLoading ? 'opacity-60 cursor-not-allowed pointer-events-none' : ''}
         ${className}
       `}
             disabled={disabled || isLoading}
@@ -63,4 +63,4 @@ const LoadingButton: React.FC<LoadingButtonProps> = ({
     );
 };
 
-export default LoadingButton;
+export default Button;

@@ -4,14 +4,12 @@ import { usePromptContext } from '../contexts/PromptContext';
 
 interface PromptRatingProps {
   promptId: string;
-  userRating: boolean | null;
   positiveCount: number;
   negativeCount: number;
 }
 
 const PromptRating: React.FC<PromptRatingProps> = ({
   promptId,
-  userRating,
   positiveCount = 0,
   negativeCount = 0
 }) => {
@@ -27,7 +25,7 @@ const PromptRating: React.FC<PromptRatingProps> = ({
         <button
           onClick={() => handleRate(true)}
           className={`p-1 rounded-full ${
-            userRating === true
+            positiveCount > negativeCount
               ? 'bg-green-100 text-green-600'
               : 'text-gray-400 hover:text-green-600 hover:bg-green-50'
           }`}
@@ -43,7 +41,7 @@ const PromptRating: React.FC<PromptRatingProps> = ({
         <button
           onClick={() => handleRate(false)}
           className={`p-1 rounded-full ${
-            userRating === false
+            positiveCount < negativeCount
               ? 'bg-red-100 text-red-600'
               : 'text-gray-400 hover:text-red-600 hover:bg-red-50'
           }`}

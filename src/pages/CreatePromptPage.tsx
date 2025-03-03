@@ -6,7 +6,7 @@ import TagSelector from '../components/TagSelector';
 import VariableEditor from '../components/VariableEditor';
 import { Prompt, Variable } from '../types';
 import analyticsService from '../services/analyticsService';
-import LoadingButton from "../components/LoadingButton.tsx";
+import Button from "../components/Button.tsx";
 import {useToast} from "../contexts/ToastContext.tsx";
 
 const CreatePromptPage: React.FC = () => {
@@ -315,7 +315,7 @@ const CreatePromptPage: React.FC = () => {
           </div>
           
           <div className="flex justify-end">
-            <LoadingButton
+            <Button
                 isLoading={isSaving}
                 loadingText="Saving..."
               onClick={handleSave}
@@ -323,7 +323,7 @@ const CreatePromptPage: React.FC = () => {
             >
               <Save className="h-4 w-4 mr-2" />
               {isEditing ? ' Save Changes' : 'Create Template'}
-            </LoadingButton>
+            </Button>
           </div>
         </div>
       </div>
