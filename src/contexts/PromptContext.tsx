@@ -183,7 +183,7 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         ...prompt,
         id: prompt.id || `custom-${uuidv4()}`,
         createdAt: new Date().toISOString(),
-        isCustom: true
+        isCustom: PromptType.LOCAL_TEMPLATE
       };
       
       setPrompts(prevPrompts => [...prevPrompts, newPrompt]);

@@ -1,4 +1,4 @@
-import {Prompt, Variable} from '../types';
+import {Prompt, PromptType, Variable} from '../types';
 import {isSupabaseConfigured, safeSupabaseQuery, supabase} from './supabaseClient';
 import {v4 as uuidv4} from 'uuid';
 
@@ -14,7 +14,7 @@ export const loadPromptsFromFile = async (): Promise<Prompt[]> => {
         return data.prompts.map((prompt: Prompt) => ({
             ...prompt,
             createdAt: prompt.createdAt || new Date().toISOString(),
-            isCustom: false,
+            type: PromptType.SYSTEM_TEMPLATE,
             positiveRatings: 0,
             negativeRatings: 0,
             userRating: null
@@ -79,7 +79,7 @@ export const loadPromptsFromSupabase = async (): Promise<Prompt[]> => {
                 variables: item.variables as unknown as Variable[],
                 tags: item.tags || [],
                 createdAt: item.created_at,
-                isCustom: item.is_custom,
+                isCustom: item.is_custom ? PromptType.LOCAL_TEMPLATE : PromptType.SYSTEM_TEMPLATE,
                 positiveRatings: item.positive_ratings || 0,
                 negativeRatings: item.negative_ratings || 0,
                 userRating: null
