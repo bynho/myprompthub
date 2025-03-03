@@ -274,7 +274,6 @@ const PromptDetailPage: React.FC = () => {
                         }
                         <Button
                             onClick={handleCopy}
-                            variant={'secondary'}
                             icon={<Copy className="h-4 w-4 mx-1"/>}>
                             Copy
                         </Button>
