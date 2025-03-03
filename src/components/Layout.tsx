@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Search, Save, Home, Menu, X, Settings, Globe } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { Search, Save, Home, Menu, X, Settings } from 'lucide-react';
 import analyticsService from '../services/analyticsService';
 
 interface LayoutProps {
@@ -10,7 +10,6 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
 
   // Track navigation events
   useEffect(() => {

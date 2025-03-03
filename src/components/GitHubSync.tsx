@@ -5,9 +5,13 @@ import githubService from '../services/secureGithubService';
 import GitHubLogin from './GitHubLogin';
 import {useToast} from "../contexts/ToastContext.tsx";
 
-const GitHubSync: React.FC = ({
-                                  hideInfo
-                              }: { hideInfo: boolean }) => {
+interface GitHubSyncProps {
+    hideInfo?: boolean
+}
+
+const GitHubSync: React.FC<GitHubSyncProps> = ({
+                                                   hideInfo
+                                               }) => {
     const {
         savedPrompts,
         prompts,

@@ -36,13 +36,13 @@ const analyticsService = {
     }
 
     // Initialize Google Analytics if enabled
-    if (preferences.ga && import.meta.env.PROD) {
+    if (preferences?.ga && import.meta.env.PROD) {
       ReactGA.initialize(MEASUREMENT_ID);
       console.log('Google Analytics initialized');
     }
 
     // Initialize Microsoft Clarity if enabled
-    if (preferences.clarity && import.meta.env.PROD) {
+    if (preferences?.clarity && import.meta.env.PROD) {
       initClarity();
       console.log('Microsoft Clarity initialized');
     }

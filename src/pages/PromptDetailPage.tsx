@@ -17,6 +17,7 @@ import PromptRating from '../components/PromptRating';
 import analyticsService from '../services/analyticsService';
 import {Prompt, Variable} from "../types";
 import Button from "../components/Button.tsx";
+import {v4 as uuidv4} from "uuid";
 
 const PromptDetailPage: React.FC = () => {
     const {id} = useParams<{ id: string }>();
@@ -102,15 +103,13 @@ const PromptDetailPage: React.FC = () => {
     const handleSave = () => {
         if (prompt) {
             savePrompt({
-                id: `saved-${Date.now()}`,
+                ...prompt,
+                id: uuidv4(),
                 originalPromptId: prompt.id,
-                title: prompt.title,
-                category: prompt.category,
-                description: prompt.description,
-                generatedContent,
+                content: generatedContent,
                 tags: selectedTags,
                 folder: selectedFolder,
-                savedAt: new Date().toISOString()
+                createdAt: new Date().toISOString()
             });
 
             setIsSaved(true);
@@ -263,7 +262,6 @@ const PromptDetailPage: React.FC = () => {
                         </div>
                     </div>
 
-                    { prompt.isCustom ? 'custom' : 'not custom' }
                     <div className="flex justify-end gap-3">
                         {
                             prompt.isCustom === true && (

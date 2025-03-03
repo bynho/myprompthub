@@ -36,12 +36,12 @@ export const downloadAsFile = (content: string, filename: string, contentType: s
 
 // Export prompt as text file
 export const exportPromptAsText = (prompt: SavedPrompt): string => {
-  return `# ${prompt.title}\n\n${prompt.description}\n\n${prompt.generatedContent}`;
+  return `# ${prompt.title}\n\n${prompt.description}\n\n${prompt.content}`;
 };
 
 // Export prompts as markdown
 export const exportPromptsAsMarkdown = (prompts: SavedPrompt[]): string => {
   return prompts.map(prompt => {
-    return `# ${prompt.title}\n\n${prompt.description}\n\n${prompt.generatedContent}\n\n---\n\n`;
+    return `# ${prompt.title}\n\n${prompt.description}\n\n${prompt.content}\n\n---\n\n`;
   }).join('');
 };

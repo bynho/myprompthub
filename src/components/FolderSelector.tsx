@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Folder, FolderPlus, X } from 'lucide-react';
+import { FolderPlus, X } from 'lucide-react';
 import { usePrompts } from '../contexts/PromptContext';
 
 interface FolderSelectorProps {

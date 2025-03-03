@@ -28,7 +28,7 @@ const SavedPromptsPage: React.FC = () => {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(prompt => 
         prompt.title.toLowerCase().includes(query) || 
-        prompt.generatedContent.toLowerCase().includes(query)
+        prompt.content.toLowerCase().includes(query)
       );
     }
     
@@ -142,8 +142,8 @@ const SavedPromptsPage: React.FC = () => {
                 >
                   <option value="">All Folders</option>
                   {folders.map(folder => (
-                    <option key={folder} value={folder}>
-                      {folder}
+                    <option key={folder.id} value={folder.name}>
+                      {folder.name}
                     </option>
                   ))}
                 </select>

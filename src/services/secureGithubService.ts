@@ -12,12 +12,25 @@ interface GistContent {
 
 interface GistFile {
     content: string;
+    filename?: string;
+    type?: string;
+    language?: string;
+    raw_url?: string;
+    size?: number;
 }
 
+// Updated Gist interface to match Octokit's return type
 interface Gist {
     id: string;
-    description: string;
+    description: string | null;
     files: Record<string, GistFile>;
+    url?: string;
+    forks_url?: string;
+    commits_url?: string;
+    node_id?: string;
+    git_pull_url?: string;
+    git_push_url?: string;
+    html_url?: string;
 }
 
 const GIST_FILENAME = 'myprompt-hub-data.json';
@@ -43,7 +56,7 @@ class GitHubService {
             const tokenData = await secureStorageService.getItem<{
                 token: string;
                 expiry: number;
-            }>(STORAGE_KEY_TOKEN);
+            } | null>(STORAGE_KEY_TOKEN);
 
             // Check if token exists and isn't expired
             const now = Date.now();
@@ -54,7 +67,7 @@ class GitHubService {
             }
 
             // Get gist ID
-            this.gistId = await secureStorageService.getItem<string>(STORAGE_KEY_GIST_ID);
+            this.gistId = await secureStorageService.getItem<string | null>(STORAGE_KEY_GIST_ID);
         } catch (error) {
             errorService.handleError(error as Error, {
                 context: {component: 'GitHubService', method: 'loadCredentials'},
@@ -135,13 +148,14 @@ class GitHubService {
      * Get the user's Gists
      */
     async getUserGists(): Promise<Gist[]> {
-        if (!this.isAuthenticated()) {
+        if (!this.isAuthenticated() || !this.octokit) {
             throw new Error('Not authenticated');
         }
 
         try {
-            const {data} = await this.octokit!.rest.gists.list();
-            return data;
+            const response = await this.octokit.rest.gists.list();
+            // Explicitly type cast the response to match Gist[] interface
+            return response.data as unknown as Gist[];
         } catch (error) {
             errorService.handleError(error as Error, {
                 context: {component: 'GitHubService', method: 'getUserGists'},
@@ -156,7 +170,7 @@ class GitHubService {
      * Create a new Gist for storing prompt data
      */
     async createGist(data: GistContent): Promise<string> {
-        if (!this.isAuthenticated()) {
+        if (!this.isAuthenticated() || !this.octokit) {
             throw new Error('Not authenticated');
         }
 
@@ -165,7 +179,7 @@ class GitHubService {
             const sanitizedData = this.sanitizeDataForGist(data);
 
             // Create the Gist
-            const {data: gist} = await this.octokit!.rest.gists.create({
+            const response = await this.octokit.rest.gists.create({
                 description: 'MyPromptHub saved prompts and templates',
                 public: false,
                 files: {
@@ -175,8 +189,13 @@ class GitHubService {
                 }
             });
 
+            const gist = response.data;
+
+            if (!gist.id) {
+                throw new Error('Failed to create Gist on GitHub.');
+            }
             // Store the Gist ID
-            this.gistId = gist.id;
+            this.gistId = gist.id ?? null;
             await secureStorageService.setItem(STORAGE_KEY_GIST_ID, gist.id);
 
             return gist.id;
@@ -194,7 +213,7 @@ class GitHubService {
      * Update an existing Gist with new data
      */
     async updateGist(data: GistContent): Promise<void> {
-        if (!this.isAuthenticated() || !this.gistId) {
+        if (!this.isAuthenticated() || !this.octokit || !this.gistId) {
             throw new Error('Not authenticated or no Gist ID');
         }
 
@@ -203,7 +222,7 @@ class GitHubService {
             const sanitizedData = this.sanitizeDataForGist(data);
 
             // Update the Gist
-            await this.octokit!.rest.gists.update({
+            await this.octokit.rest.gists.update({
                 gist_id: this.gistId,
                 files: {
                     [GIST_FILENAME]: {
@@ -225,18 +244,23 @@ class GitHubService {
      * Get content from a Gist
      */
     async getGistContent(): Promise<GistContent | null> {
-        if (!this.isAuthenticated() || !this.gistId) {
+        if (!this.isAuthenticated() || !this.octokit || !this.gistId) {
             throw new Error('Not authenticated or no Gist ID');
         }
 
         try {
             // Get the Gist
-            const {data} = await this.octokit!.rest.gists.get({
+            const response = await this.octokit.rest.gists.get({
                 gist_id: this.gistId
             });
 
+            const data = response.data;
+
+            if (!data.files) {
+                return null;
+            }
             // Get the file content
-            const file = data.files[GIST_FILENAME];
+            const file = data?.files[GIST_FILENAME];
             if (!file || !file.content) {
                 return null;
             }
@@ -299,7 +323,7 @@ class GitHubService {
      * Check token validity and refresh if needed
      */
     async checkTokenValidity(): Promise<boolean> {
-        if (!this.token || !this.tokenExpiry) {
+        if (!this.token || !this.tokenExpiry || !this.octokit) {
             return false;
         }
 
@@ -307,21 +331,20 @@ class GitHubService {
         if (this.tokenExpiry < Date.now() + 24 * 60 * 60 * 1000) {
             try {
                 // Verify the token still works
-                if (this.octokit) {
-                    await this.octokit.rest.users.getAuthenticated();
+                await this.octokit.rest.users.getAuthenticated();
 
-                    // Extend the token expiry
-                    this.tokenExpiry = Date.now() + 30 * 24 * 60 * 60 * 1000;
+                // Extend the token expiry
+                this.tokenExpiry = Date.now() + 30 * 24 * 60 * 60 * 1000;
 
-                    // Update stored data
-                    await secureStorageService.setItem(STORAGE_KEY_TOKEN, {
-                        token: this.token,
-                        expiry: this.tokenExpiry
-                    });
-                }
+                // Update stored data
+                await secureStorageService.setItem(STORAGE_KEY_TOKEN, {
+                    token: this.token,
+                    expiry: this.tokenExpiry
+                });
 
                 return true;
             } catch (error) {
+                console.error(error as Error);
                 // Token is no longer valid
                 this.logout();
                 return false;
@@ -342,10 +365,10 @@ class GitHubService {
 
             // Trim long content for performance
             sanitized.savedPrompts = sanitized.savedPrompts.map(prompt => {
-                if (prompt.generatedContent && prompt.generatedContent.length > 10000) {
+                if (prompt.content && prompt.content.length > 10000) {
                     return {
                         ...prompt,
-                        generatedContent: prompt.generatedContent.substring(0, 10000) +
+                        generatedContent: prompt.content.substring(0, 10000) +
                             '... [content truncated for storage]'
                     };
                 }
@@ -377,7 +400,7 @@ class GitHubService {
     /**
      * Validate Gist content to ensure it's valid
      */
-    private validateGistContent(content: any): GistContent {
+    private validateGistContent(content: GistContent): GistContent {
         // Basic structure validation
         if (!content ||
             !Array.isArray(content.savedPrompts) ||
@@ -391,7 +414,7 @@ class GitHubService {
             content.lastSynced = new Date().toISOString();
         }
 
-        return content;
+        return content as GistContent;
     }
 }
 

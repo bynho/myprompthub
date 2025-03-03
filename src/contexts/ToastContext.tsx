@@ -154,6 +154,7 @@ export const registerErrorToastHandler = (
 ): void => {
     import('../services/errorService').then(({ default: errorService }) => {
         errorService.registerErrorHandler((error, options) => {
+            console.error(error);
             if (options?.userMessage) {
                 addToast({
                     type: 'error',

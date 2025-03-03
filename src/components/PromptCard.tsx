@@ -10,6 +10,8 @@ interface PromptCardProps {
 
 const PromptCard: React.FC<PromptCardProps> = ({ prompt }) => {
   const navigate = useNavigate();
+  const positiveRatings = prompt.positiveRatings ?? 0;
+  const negativeRatings = prompt.negativeRatings ?? 0;
 
   const handleCardClick = () => {
     // Track prompt card click
@@ -63,15 +65,15 @@ const PromptCard: React.FC<PromptCardProps> = ({ prompt }) => {
         </div>
         
         {/* Ratings display */}
-        {(prompt.positiveRatings > 0 || prompt.negativeRatings > 0) && (
+        {(positiveRatings > 0 || negativeRatings > 0) && (
           <div className="flex items-center text-sm text-gray-500 mb-3">
             <div className="flex items-center mr-3">
               <ThumbsUp className="h-3 w-3 mr-1 text-green-500" />
-              <span>{prompt.positiveRatings || 0}</span>
+              <span>{positiveRatings}</span>
             </div>
             <div className="flex items-center">
               <ThumbsDown className="h-3 w-3 mr-1 text-red-500" />
-              <span>{prompt.negativeRatings || 0}</span>
+              <span>{negativeRatings}</span>
             </div>
           </div>
         )}

@@ -23,17 +23,21 @@ export interface Prompt {
   userRating?: boolean | null; // true for positive, false for negative, null for no rating
 }
 
-export interface SavedPrompt {
-  id: string;
+export interface SavedPrompt extends Prompt {
   originalPromptId: string;
-  title: string;
-  category: string;
-  description: string;
-  generatedContent: string;
-  tags: string[];
   folder?: string;
-  savedAt: string;
 }
+// export interface SavedPrompt {
+//   id: string;
+//   originalPromptId: string;
+//   title: string;
+//   category: string;
+//   description: string;
+//   generatedContent: string;
+//   tags: string[];
+//   folder?: string;
+//   savedAt: string;
+// }
 
 export interface Folder {
   id: string;

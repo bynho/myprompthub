@@ -57,7 +57,7 @@ class ErrorBoundary extends Component<Props, State> {
                 if (typeof this.props.fallback === 'function' && this.state.error) {
                     return this.props.fallback(this.state.error, this.resetErrorBoundary);
                 }
-                return this.props.fallback;
+                return this.props.fallback as ReactNode;
             }
 
             // Default fallback UI

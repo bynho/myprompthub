@@ -1,34 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, Check, Database, AlertCircle, Loader } from 'lucide-react';
+import { ArrowLeft, Check, Database, AlertCircle, Loader } from 'lucide-react';
 import GitHubSync from '../components/GitHubSync';
-import analyticsService from '../services/analyticsService';
+// import analyticsService from '../services/analyticsService';
 import { isSupabaseConfigured, checkSupabaseConnection } from '../services/supabaseClient';
 
 const SettingsPage: React.FC = () => {
   const navigate = useNavigate();
-  const [saved, setSaved] = useState(false);
+  // const [saved, setSaved] = useState(false);
   const [isSupabaseEnabled] = useState<boolean>(isSupabaseConfigured());
   const [isSupabaseConnected, setIsSupabaseConnected] = useState<boolean | null>(null);
   const [checkingConnection, setCheckingConnection] = useState<boolean>(false);
 
-  const [gaEnabled, setGaEnabled] = useState(() => {
-    try {
-      const preferences = JSON.parse(localStorage.getItem('analytics-preferences') || '{}');
-      return preferences.ga !== undefined ? preferences.ga : true;
-    } catch {
-      return true;
-    }
-  });
-
-  const [clarityEnabled, setClarityEnabled] = useState(() => {
-    try {
-      const preferences = JSON.parse(localStorage.getItem('analytics-preferences') || '{}');
-      return preferences.clarity !== undefined ? preferences.clarity : true;
-    } catch {
-      return true;
-    }
-  });
+  // const [gaEnabled, setGaEnabled] = useState(() => {
+  //   try {
+  //     const preferences = JSON.parse(localStorage.getItem('analytics-preferences') || '{}');
+  //     return preferences.ga !== undefined ? preferences.ga : true;
+  //   } catch {
+  //     return true;
+  //   }
+  // });
+  //
+  // const [clarityEnabled, setClarityEnabled] = useState(() => {
+  //   try {
+  //     const preferences = JSON.parse(localStorage.getItem('analytics-preferences') || '{}');
+  //     return preferences.clarity !== undefined ? preferences.clarity : true;
+  //   } catch {
+  //     return true;
+  //   }
+  // });
 
   useEffect(() => {
     const checkConnection = async () => {
@@ -51,17 +51,17 @@ const SettingsPage: React.FC = () => {
     checkConnection();
   }, [isSupabaseEnabled]);
 
-  const handleSaveAnalytics = () => {
-    const preferences = { ga: gaEnabled, clarity: clarityEnabled };
-    localStorage.setItem('analytics-preferences', JSON.stringify(preferences));
-    analyticsService.init(preferences);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
-    if (gaEnabled) {
-      analyticsService.event('Settings', 'update_analytics_preferences',
-          `GA: ${gaEnabled}, Clarity: ${clarityEnabled}`);
-    }
-  };
+  // const handleSaveAnalytics = () => {
+  //   const preferences = { ga: gaEnabled, clarity: clarityEnabled };
+  //   localStorage.setItem('analytics-preferences', JSON.stringify(preferences));
+  //   analyticsService.init(preferences);
+  //   setSaved(true);
+  //   setTimeout(() => setSaved(false), 3000);
+  //   if (gaEnabled) {
+  //     analyticsService.event('Settings', 'update_analytics_preferences',
+  //         `GA: ${gaEnabled}, Clarity: ${clarityEnabled}`);
+  //   }
+  // };
 
   return (
       <div className="max-w-3xl mx-auto py-8 px-4">

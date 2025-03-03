@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LogOut, AlertCircle, ExternalLink } from 'lucide-react';
+import { AlertCircle, ExternalLink } from 'lucide-react';
 import githubService from '../services/secureGithubService';
 import {SiGithub} from "@icons-pack/react-simple-icons";
 
