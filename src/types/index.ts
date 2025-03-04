@@ -4,6 +4,7 @@ export interface Variable {
   description: string;
   type: 'text' | 'textarea' | 'number' | 'email' | 'url' | 'date' | 'select';
   placeholder: string;
+  value: string;
   options?: string[]; // For select type
 }
 

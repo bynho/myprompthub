@@ -42,7 +42,7 @@ const SavedPromptCard: React.FC<SavedPromptCardProps> = ({prompt}) => {
             <div className="p-5">
                 <div className="flex justify-between items-start mb-3">
                     <Link
-                        to={`/prompt/${prompt.originalPromptId}`}
+                        to={`/prompt/${prompt.id}`}
                         className="text-lg font-semibold text-gray-900 hover:text-blue-600 line-clamp-2"
                         onClick={handleCardClick}
                     >
@@ -94,7 +94,7 @@ const SavedPromptCard: React.FC<SavedPromptCardProps> = ({prompt}) => {
                         <Copy className="h-5 w-5"/>
                     </button>
                     <Link
-                        to={`/prompt/${prompt.originalPromptId}`}
+                        to={`/prompt/${prompt.id}`}
                         className="p-2 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-full transition-colors"
                         title="Edit"
                     >

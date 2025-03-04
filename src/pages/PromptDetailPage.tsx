@@ -36,14 +36,16 @@ const PromptDetailPage: React.FC = () => {
         if (id && prompts.length > 0) {
             const foundPrompt = prompts.find(p => p.id === id);
             if (foundPrompt) {
+                console.warn('Found prompt', foundPrompt);
                 setPrompt(foundPrompt);
 
                 // Initialize variable values
                 const initialValues: Record<string, string> = {};
                 foundPrompt.variables?.forEach(variable => {
-                    initialValues[variable.id] = '';
+                    initialValues[variable.id] = variable.value || '';
                 });
                 setVariableValues(initialValues);
+
 
                 // Track prompt view
                 analyticsService.trackPromptInteraction('view', foundPrompt.id, foundPrompt.title);
@@ -69,6 +71,7 @@ const PromptDetailPage: React.FC = () => {
         }
     }, [prompt, variableValues]);
 
+
     const handleVariableChange = (variableId: string, value: string) => {
         setVariableValues(prev => ({
             ...prev,
@@ -81,14 +84,21 @@ const PromptDetailPage: React.FC = () => {
 
     const handleSave = () => {
         if (prompt) {
+            console.warn('Saving prompt', prompt);
+            const newId = uuidv4();
             savePrompt({
                 ...prompt,
-                id: uuidv4(),
+                id: newId,
+                type: PromptType.LOCAL,
                 originalPromptId: prompt.id,
                 content: generatedContent,
                 tags: selectedTags,
                 folder: selectedFolder,
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                variables: prompt.variables?.map(variable => ({
+                    ...variable,
+                    value: variableValues[variable.id]
+                }))
             });
 
             setIsSaved(true);
@@ -97,6 +107,10 @@ const PromptDetailPage: React.FC = () => {
 
             // Track save event
             analyticsService.trackPromptInteraction('save', prompt.id, prompt.title);
+
+            setTimeout(() => {
+                navigate('/saved');
+            }, 2000);
         }
     };
 
@@ -264,7 +278,7 @@ const PromptDetailPage: React.FC = () => {
                                     onClick={handleSave}
                                     variant={'primary'}
                                     icon={<Save className="h-4 w-4 mx-2"/>}>
-                                    {isSaved ? 'Saved' : 'Save'}
+                                    Save
                                 </Button>
                             )
                         }

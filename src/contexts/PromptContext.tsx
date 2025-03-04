@@ -61,9 +61,18 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       if (customPromptsJson) {
         customPrompts = JSON.parse(customPromptsJson);
       }
-      
+
+      // Load saved prompts from local storage
+      let saved: Prompt[] = [];
+      const savedPromptsJson = localStorage.getItem('saved-prompts');
+      if (savedPromptsJson) {
+        saved = JSON.parse(savedPromptsJson) ?? [];
+      }
+
+      setSavedPrompts(saved);
+
       // Combine built-in and custom prompts
-      const allPrompts = [...loadedPrompts, ...customPrompts];
+      const allPrompts = [...loadedPrompts, ...customPrompts, ...saved];
       setPrompts(allPrompts);
       
       // Extract categories and tags
@@ -76,11 +85,7 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       });
       setTags(Array.from(allTags));
       
-      // Load saved prompts from local storage
-      const savedPromptsJson = localStorage.getItem('saved-prompts');
-      if (savedPromptsJson) {
-        setSavedPrompts(JSON.parse(savedPromptsJson));
-      }
+
 
       // Load folders from local storage
       const foldersJson = localStorage.getItem('folders');
@@ -135,6 +140,7 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   // Save changes to localStorage whenever savedPrompts changes
   useEffect(() => {
     if (savedPrompts.length > 0) {
+      console.warn('Saving savedPrompts', savedPrompts);
       localStorage.setItem('saved-prompts', JSON.stringify(savedPrompts));
     }
   }, [savedPrompts]);
@@ -277,7 +283,9 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         type: PromptType.LOCAL,
         savedAt: new Date().toISOString()
       };
-      
+
+      console.warn('Save prompt:', newPrompt);
+
       setSavedPrompts(prevPrompts => {
         const existingIndex = prevPrompts.findIndex(p => p.id === prompt.id);
         

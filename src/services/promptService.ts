@@ -79,7 +79,7 @@ export const loadPromptsFromSupabase = async (): Promise<Prompt[]> => {
                 variables: item.variables as unknown as Variable[],
                 tags: item.tags || [],
                 createdAt: item.created_at,
-                isCustom: item.is_custom ? PromptType.LOCAL_TEMPLATE : PromptType.SYSTEM_TEMPLATE,
+                type: item.is_custom ? PromptType.LOCAL_TEMPLATE : PromptType.SYSTEM_TEMPLATE,
                 positiveRatings: item.positive_ratings || 0,
                 negativeRatings: item.negative_ratings || 0,
                 userRating: null
