@@ -178,7 +178,7 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         description: `Enter value for ${readableName}`,
         type: 'text',
         placeholder: `e.g., value for ${varName}`
-      };
+      } as Variable;
     });
   };
 
@@ -222,34 +222,34 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
   // Update a prompt template
   const updatePromptTemplate = (prompt: Prompt) => {
-    try {
-      setPrompts(prevPrompts => 
-        prevPrompts.map(p => p.id === prompt.id ? { ...prompt, isCustom: true } : p)
-      );
-      
-      // Update categories if needed
-      if (!categories.includes(prompt.category)) {
-        setCategories(prev => [...prev, prompt.category]);
-      }
-      
-      // Update tags if needed
-      const newTags = prompt.tags.filter(tag => !tags.includes(tag));
-      if (newTags.length > 0) {
-        setTags(prev => [...prev, ...newTags]);
-      }
-      
-      // Save custom prompts to localStorage
-      const customPrompts = prompts
-        .filter(p => p.type === PromptType.LOCAL_TEMPLATE && p.id !== prompt.id);
+  try {
+    // Update the prompt in state, ensuring the isCustom flag is consistent
+    const updatedPrompts = prompts.map(p =>
+      p.id === prompt.id ? { ...prompt, isCustom: PromptType.LOCAL_TEMPLATE } : p
+    );
+    setPrompts(updatedPrompts);
 
-      localStorage.setItem('custom-prompts', JSON.stringify(customPrompts));
-      
-      analyticsService.event('Prompt', 'update_template', prompt.title);
-    } catch (err) {
-      setError('Failed to update prompt template');
-      console.error('Error updating prompt template:', err);
-      analyticsService.trackError('Failed to update prompt template');
+    // Update categories if needed
+    if (!categories.includes(prompt.category)) {
+      setCategories(prev => [...prev, prompt.category]);
     }
+
+    // Update tags if needed
+    const newTags = prompt.tags.filter(tag => !tags.includes(tag));
+    if (newTags.length > 0) {
+      setTags(prev => [...prev, ...newTags]);
+    }
+
+    // Save updated custom prompts to localStorage
+    const customPrompts = updatedPrompts.filter(p => p.type === PromptType.LOCAL_TEMPLATE);
+    localStorage.setItem('custom-prompts', JSON.stringify(customPrompts));
+
+    analyticsService.event('Prompt', 'update_template', prompt.title);
+  } catch (err) {
+    setError('Failed to update prompt template');
+    console.error('Error updating prompt template:', err);
+    analyticsService.trackError('Failed to update prompt template');
+  }
   };
 
   // Delete a prompt template

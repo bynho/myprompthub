@@ -64,6 +64,7 @@ const PromptDetailPage: React.FC = () => {
             // Replace variables with values
             Object.entries(variableValues).forEach(([key, value]) => {
                 const regex = new RegExp(`{${key}}`, 'g');
+                value = `<b>${value}</b>`;
                 content = content.replace(regex, value || `{${key}}`);
             });
 
@@ -227,7 +228,8 @@ const PromptDetailPage: React.FC = () => {
                 <div className="mb-8">
                     <h2 className="text-lg font-semibold text-gray-900 mb-4">Generated Prompt</h2>
                     <div className="bg-gray-50 p-4 rounded-md border border-gray-200">
-                        <pre className="whitespace-pre-wrap text-gray-800 font-mono text-sm">{generatedContent}</pre>
+                        <div className="whitespace-pre-wrap text-gray-800 font-mono text-sm"
+                             dangerouslySetInnerHTML={{__html: generatedContent}}/>
                     </div>
                 </div>
 
