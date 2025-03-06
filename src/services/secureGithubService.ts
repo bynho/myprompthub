@@ -1,4 +1,4 @@
-import {Octokit} from 'octokit';
+import {Octokit} from '@octokit/rest';
 import {Folder, Prompt} from '../types';
 import secureStorageService from './secureStorageService';
 import errorService from './errorService';
@@ -266,7 +266,7 @@ class GitHubService {
             }
 
             // Parse and validate the content
-            const content = JSON.parse(file.content) as GistContent;
+            const content: GistContent = JSON.parse(file.content);
             return this.validateGistContent(content);
         } catch (error) {
             errorService.handleError(error as Error, {
