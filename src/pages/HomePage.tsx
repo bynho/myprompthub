@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {Link} from 'react-router-dom';
-import {Clock, Github, Save, Search} from 'lucide-react';
+import {Clock, Save, Search} from 'lucide-react';
 import {usePromptContext} from '../contexts/PromptContext';
 import analyticsService from '../services/analyticsService';
 
@@ -73,23 +73,23 @@ const HomePage: React.FC = () => {
                     </div>
                 </Link>
 
-                <Link
-                    to="/settings"
-                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200"
-                    onClick={() => handleFeatureClick('settings')}
-                >
-                    <div className="flex flex-col items-center text-center">
-                        <div className="bg-purple-100 p-3 rounded-full mb-4">
-                            <Github className="h-6 w-6 text-purple-600"/>
-                        </div>
-                        <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                            Sync with GitHub
-                        </h2>
-                        <p className="text-gray-600">
-                            MyPromptHub saved prompts and templates
-                        </p>
-                    </div>
-                </Link>
+                {/*<Link*/}
+                {/*    to="/settings"*/}
+                {/*    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200"*/}
+                {/*    onClick={() => handleFeatureClick('settings')}*/}
+                {/*>*/}
+                {/*    <div className="flex flex-col items-center text-center">*/}
+                {/*        <div className="bg-purple-100 p-3 rounded-full mb-4">*/}
+                {/*            <Github className="h-6 w-6 text-purple-600"/>*/}
+                {/*        </div>*/}
+                {/*        <h2 className="text-xl font-semibold text-gray-900 mb-2">*/}
+                {/*            Sync with GitHub*/}
+                {/*        </h2>*/}
+                {/*        <p className="text-gray-600">*/}
+                {/*            MyPromptHub saved prompts and templates*/}
+                {/*        </p>*/}
+                {/*    </div>*/}
+                {/*</Link>*/}
 
                 <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
                     <div className="flex flex-col items-center text-center">
