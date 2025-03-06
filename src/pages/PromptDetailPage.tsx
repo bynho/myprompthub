@@ -17,6 +17,7 @@ const PromptDetailPage: React.FC = () => {
     const navigate = useNavigate();
     const {
         prompts,
+        savedPrompts,
         deletePromptTemplate,
         savePrompt,
         copyToClipboard,
@@ -33,10 +34,20 @@ const PromptDetailPage: React.FC = () => {
 
     // Find the prompt by ID
     useEffect(() => {
-        if (id && prompts.length > 0) {
-            const foundPrompt = prompts.find(p => p.id === id);
+        if (id) {
+            console.warn('Looking for prompt with ID:', id);
+
+            // First look in the combined prompts array
+            let foundPrompt = prompts.find(p => p.id === id);
+
+            // If not found in the combined array, check specifically in savedPrompts
+            if (!foundPrompt) {
+                console.warn('Not found in combined prompts, checking savedPrompts');
+                foundPrompt = savedPrompts.find(p => p.id === id);
+            }
+
             if (foundPrompt) {
-                console.warn('Found prompt', foundPrompt);
+                console.warn('Found prompt:', foundPrompt);
                 setPrompt(foundPrompt);
 
                 // Initialize variable values
@@ -46,15 +57,23 @@ const PromptDetailPage: React.FC = () => {
                 });
                 setVariableValues(initialValues);
 
+                // Set the initial tags and folder if present
+                if (foundPrompt.tags && foundPrompt.tags.length > 0) {
+                    setSelectedTags(foundPrompt.tags);
+                }
+
+                if (foundPrompt.folder) {
+                    setSelectedFolder(foundPrompt.folder);
+                }
 
                 // Track prompt view
                 analyticsService.trackPromptInteraction('view', foundPrompt.id, foundPrompt.title);
             } else {
-                navigate('/browse');
+                console.warn('Prompt not found with ID:', id);
+                setPrompt(null);
             }
         }
-    }, [id, prompts, navigate]);
-
+    }, [id, prompts, savedPrompts, navigate]);
 
     // Generate content when variable values change
     useEffect(() => {
@@ -72,7 +91,6 @@ const PromptDetailPage: React.FC = () => {
         }
     }, [prompt, variableValues]);
 
-
     const handleVariableChange = (variableId: string, value: string) => {
         setVariableValues(prev => ({
             ...prev,
@@ -87,7 +105,8 @@ const PromptDetailPage: React.FC = () => {
         if (prompt) {
             console.warn('Saving prompt', prompt);
             const newId = uuidv4();
-            savePrompt({
+
+            const newPrompt = {
                 ...prompt,
                 id: newId,
                 type: PromptType.LOCAL,
@@ -100,18 +119,18 @@ const PromptDetailPage: React.FC = () => {
                     ...variable,
                     value: variableValues[variable.id]
                 }))
-            });
+            };
 
+            savePrompt(newPrompt);
             setIsSaved(true);
+
+            // Navigate to the new prompt immediately
+            navigate(`/prompt/${newId}`, { replace: true });
 
             addToast({message: 'Prompt saved successfully', type: 'success'});
 
             // Track save event
             analyticsService.trackPromptInteraction('save', prompt.id, prompt.title);
-
-            setTimeout(() => {
-                navigate('/saved');
-            }, 2000);
         }
     };
 
@@ -134,6 +153,8 @@ const PromptDetailPage: React.FC = () => {
             return;
         }
         deletePromptTemplate(prompt.id);
+        navigate('/browse');
+
         // Track delete event
         analyticsService.trackPromptInteraction('delete', prompt?.id || '', prompt?.title || '');
     }
@@ -153,8 +174,27 @@ const PromptDetailPage: React.FC = () => {
 
     if (!prompt) {
         return (
-            <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            <div className="max-w-4xl mx-auto py-8 px-4">
+                <button
+                    onClick={() => navigate(-1)}
+                    className="flex items-center text-gray-600 hover:text-gray-900 mb-6"
+                >
+                    <ArrowLeft className="h-5 w-5 mr-1"/>
+                    Back
+                </button>
+
+                <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+                    <h1 className="text-2xl font-bold text-gray-900 mb-4">Prompt not found</h1>
+                    <p className="text-gray-600 mb-4">
+                        The prompt you are looking for could not be found.
+                    </p>
+                    <button
+                        onClick={() => navigate('/browse')}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                    >
+                        Browse Prompts
+                    </button>
+                </div>
             </div>
         );
     }
@@ -174,16 +214,16 @@ const PromptDetailPage: React.FC = () => {
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900 mb-2">{prompt.title}</h1>
                         <div className="flex items-center mb-4">
-              <span className="px-3 py-1 text-sm font-medium bg-blue-100 text-blue-800 rounded-full mr-2">
-                {prompt.category}
-              </span>
+                            <span className="px-3 py-1 text-sm font-medium bg-blue-100 text-blue-800 rounded-full mr-2">
+                                {prompt.category}
+                            </span>
                             {prompt.tags && prompt.tags.map((tag: string, index: number) => (
                                 <span
                                     key={index}
                                     className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded-full mr-1"
                                 >
-                  {tag}
-                </span>
+                                    {tag}
+                                </span>
                             ))}
                         </div>
                         <p className="text-gray-600 mb-6">{prompt.description}</p>
@@ -284,7 +324,6 @@ const PromptDetailPage: React.FC = () => {
                                 </Button>
                             )
                         }
-
                     </div>
                 </div>
             </div>

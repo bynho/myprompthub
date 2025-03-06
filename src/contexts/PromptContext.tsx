@@ -274,7 +274,7 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     }
   };
 
-  // Save a prompt
+  // Update the savePrompt function in PromptContext.tsx
   const savePrompt = (prompt: Prompt) => {
     try {
       const newPrompt = {
@@ -286,9 +286,25 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
       console.warn('Save prompt:', newPrompt);
 
+      // Update savedPrompts state
       setSavedPrompts(prevPrompts => {
         const existingIndex = prevPrompts.findIndex(p => p.id === prompt.id);
-        
+
+        if (existingIndex >= 0) {
+          // Update existing prompt
+          const updatedPrompts = [...prevPrompts];
+          updatedPrompts[existingIndex] = newPrompt;
+          return updatedPrompts;
+        } else {
+          // Add new prompt
+          return [...prevPrompts, newPrompt];
+        }
+      });
+
+      // Also update prompts state to ensure immediate access to new prompts
+      setPrompts(prevPrompts => {
+        const existingIndex = prevPrompts.findIndex(p => p.id === prompt.id);
+
         if (existingIndex >= 0) {
           // Update existing prompt
           const updatedPrompts = [...prevPrompts];
@@ -309,7 +325,11 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   // Remove a saved prompt
   const removeSavedPrompt = (id: string) => {
     try {
+      // Remove from savedPrompts state
       setSavedPrompts(prevPrompts => prevPrompts.filter(p => p.id !== id));
+
+      // Also remove from prompts state
+      setPrompts(prevPrompts => prevPrompts.filter(p => p.id !== id || p.type !== PromptType.LOCAL));
     } catch (err) {
       setError('Failed to remove prompt');
       console.error('Error removing prompt:', err);
@@ -320,8 +340,14 @@ export const PromptProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   // Update a saved prompt
   const updatePrompt = (prompt: Prompt) => {
     try {
-      setSavedPrompts(prevPrompts => 
-        prevPrompts.map(p => p.id === prompt.id ? prompt : p)
+      // Update in savedPrompts state
+      setSavedPrompts(prevPrompts =>
+          prevPrompts.map(p => p.id === prompt.id ? prompt : p)
+      );
+
+      // Also update in prompts state
+      setPrompts(prevPrompts =>
+          prevPrompts.map(p => p.id === prompt.id && p.type === PromptType.LOCAL ? prompt : p)
       );
     } catch (err) {
       setError('Failed to update prompt');
