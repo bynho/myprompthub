@@ -1,19 +1,29 @@
-import React, {useEffect, useState} from 'react';
-import {useNavigate, useParams} from 'react-router-dom';
-import {ArrowLeft, Copy, Edit, Folder, Save, Tag, Trash,} from 'lucide-react';
-import {usePromptContext} from '../contexts/PromptContext';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import {
+    Box,
+    Button,
+    Chip,
+    Container,
+    Divider,
+    Grid,
+    Paper,
+    Typography
+} from '@mui/material';
+import { ArrowLeft, Copy, Edit, Save, Trash } from 'lucide-react';
+import { usePromptContext } from '../contexts/PromptContext';
 import TagSelector from '../components/TagSelector';
 import FolderSelector from '../components/FolderSelector';
 import VariableInput from '../components/VariableInput';
 import PromptRating from '../components/PromptRating';
 import analyticsService from '../services/analyticsService';
-import {Prompt, PromptType, Variable} from "../types";
-import Button from "../components/Button.tsx";
-import {v4 as uuidv4} from "uuid";
-import {useToast} from "../contexts/ToastContext.tsx";
+import { Prompt, PromptType, Variable } from "../types";
+import { v4 as uuidv4 } from "uuid";
+import { useToast } from "../contexts/ToastContext";
+
 
 const PromptDetailPage: React.FC = () => {
-    const {id} = useParams<{ id: string }>();
+    const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const {
         prompts,
@@ -30,7 +40,7 @@ const PromptDetailPage: React.FC = () => {
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [selectedFolder, setSelectedFolder] = useState<string | undefined>(undefined);
     const [isSaved, setIsSaved] = useState<boolean>(false);
-    const {addToast} = useToast();
+    const { addToast } = useToast();
 
     // Find the prompt by ID
     useEffect(() => {
@@ -127,7 +137,7 @@ const PromptDetailPage: React.FC = () => {
             // Navigate to the new prompt immediately
             navigate(`/prompt/${newId}`, { replace: true });
 
-            addToast({message: 'Prompt saved successfully', type: 'success'});
+            addToast({ message: 'Prompt saved successfully', type: 'success' });
 
             // Track save event
             analyticsService.trackPromptInteraction('save', prompt.id, prompt.title);
@@ -157,7 +167,7 @@ const PromptDetailPage: React.FC = () => {
 
         // Track delete event
         analyticsService.trackPromptInteraction('delete', prompt?.id || '', prompt?.title || '');
-    }
+    };
 
     const handleFolderChange = (folderId: string | undefined) => {
         setSelectedFolder(folderId);
@@ -174,85 +184,108 @@ const PromptDetailPage: React.FC = () => {
 
     if (!prompt) {
         return (
-            <div className="max-w-4xl mx-auto py-8 px-4">
-                <button
+            <Container maxWidth="md" sx={{ py: 4 }}>
+                <Button
                     onClick={() => navigate(-1)}
-                    className="flex items-center text-gray-600 hover:text-gray-900 mb-6"
+                    startIcon={<ArrowLeft size={18} />}
+                    sx={{ mb: 3, color: 'primary.main' }}
                 >
-                    <ArrowLeft className="h-5 w-5 mr-1"/>
                     Back
-                </button>
+                </Button>
 
-                <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-                    <h1 className="text-2xl font-bold text-gray-900 mb-4">Prompt not found</h1>
-                    <p className="text-gray-600 mb-4">
+                <Paper sx={{ p: 4, textAlign: 'center' }}>
+                    <Typography variant="h5" gutterBottom>
+                        Prompt not found
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary" paragraph>
                         The prompt you are looking for could not be found.
-                    </p>
-                    <button
+                    </Typography>
+                    <Button
                         onClick={() => navigate('/browse')}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                        variant="contained"
+                        color="primary"
                     >
                         Browse Prompts
-                    </button>
-                </div>
-            </div>
+                    </Button>
+                </Paper>
+            </Container>
         );
     }
 
     return (
-        <div className="max-w-4xl mx-auto py-8 px-4">
-            <button
+        <Container maxWidth="md" sx={{ py: 4 }}>
+            <Button
                 onClick={() => navigate(-1)}
-                className="flex items-center text-gray-600 hover:text-gray-900 mb-6"
+                startIcon={<ArrowLeft size={18} />}
+                sx={{ mb: 3, color: 'primary.main' }}
             >
-                <ArrowLeft className="h-5 w-5 mr-1"/>
                 Back
-            </button>
+            </Button>
 
-            <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-                <div className="flex justify-between items-start mb-4">
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-900 mb-2">{prompt.title}</h1>
-                        <div className="flex items-center mb-4">
-                            <span className="px-3 py-1 text-sm font-medium bg-blue-100 text-blue-800 rounded-full mr-2">
-                                {prompt.category}
-                            </span>
+            <Paper sx={{ p: 3, mb: 4 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                    <Box>
+                        <Typography variant="h4" component="h1" gutterBottom>
+                            {prompt.title}
+                        </Typography>
+
+                        <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+                            <Chip
+                                label={prompt.category}
+                                size="small"
+                                sx={{
+                                    bgcolor: 'rgba(59, 130, 246, 0.1)',
+                                    color: 'rgb(37, 99, 235)',
+                                    fontSize: '0.75rem'
+                                }}
+                            />
                             {prompt.tags && prompt.tags.map((tag: string, index: number) => (
-                                <span
+                                <Chip
                                     key={index}
-                                    className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded-full mr-1"
-                                >
-                                    {tag}
-                                </span>
+                                    label={tag}
+                                    size="small"
+                                    sx={{
+                                        bgcolor: 'rgba(75, 85, 99, 0.1)',
+                                        color: 'text.secondary',
+                                        fontSize: '0.75rem'
+                                    }}
+                                />
                             ))}
-                        </div>
-                        <p className="text-gray-600 mb-6">{prompt.description}</p>
-                    </div>
+                        </Box>
+
+                        <Typography variant="body1" color="text.secondary" paragraph>
+                            {prompt.description}
+                        </Typography>
+                    </Box>
 
                     {prompt.type === PromptType.LOCAL_TEMPLATE && (
-                        <button
+                        <Button
                             onClick={handleEditTemplate}
-                            className="px-3 py-1 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center"
+                            variant="outlined"
+                            size="small"
+                            startIcon={<Edit size={16} />}
+                            sx={{ ml: 2 }}
                         >
-                            <Edit className="h-4 w-4 mr-1"/>
                             Edit Template
-                        </button>
+                        </Button>
                     )}
-                </div>
+                </Box>
 
                 {/* Prompt rating component */}
-                <div className="mb-6">
+                <Box sx={{ mb: 3 }}>
                     <PromptRating
                         promptId={prompt.id}
                         positiveCount={prompt.positiveRatings || 0}
                         negativeCount={prompt.negativeRatings || 0}
                     />
-                </div>
+                </Box>
 
                 {prompt.variables && prompt.variables.length > 0 && (
-                    <div className="mb-8">
-                        <h2 className="text-lg font-semibold text-gray-900 mb-4">Customize Prompt</h2>
-                        <div className="space-y-4">
+                    <Box sx={{ mb: 4 }}>
+                        <Typography variant="h6" gutterBottom>
+                            Customize Prompt
+                        </Typography>
+                        <Box sx={{ mt: 2 }}>
                             {prompt.variables.map((variable: Variable) => (
                                 <VariableInput
                                     key={variable.id}
@@ -261,73 +294,87 @@ const PromptDetailPage: React.FC = () => {
                                     onChange={(value) => handleVariableChange(variable.id, value)}
                                 />
                             ))}
-                        </div>
-                    </div>
+                        </Box>
+                    </Box>
                 )}
 
-                <div className="mb-8">
-                    <h2 className="text-lg font-semibold text-gray-900 mb-4">Generated Prompt</h2>
-                    <div className="bg-gray-50 p-4 rounded-md border border-gray-200">
-                        <div className="whitespace-pre-wrap text-gray-800 font-mono text-sm"
-                             dangerouslySetInnerHTML={{__html: generatedContent}}/>
-                    </div>
-                </div>
+                <Box sx={{ mb: 4 }}>
+                    <Typography variant="h6" gutterBottom>
+                        Generated Prompt
+                    </Typography>
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            p: 3,
+                            bgcolor: 'rgba(249, 250, 251, 0.8)',
+                            border: 1,
+                            borderColor: 'divider',
+                            borderRadius: 1,
+                            fontFamily: 'monospace',
+                            fontSize: '0.875rem',
+                            whiteSpace: 'pre-wrap'
+                        }}
+                        dangerouslySetInnerHTML={{ __html: generatedContent }}
+                    />
+                </Box>
 
-                <div className="border-t border-gray-200 pt-6">
-                    <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
-                        <div className="flex-1">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                <Tag className="h-4 w-4 inline mr-1"/>
-                                Tags
-                            </label>
-                            <TagSelector
-                                availableTags={tags}
-                                selectedTags={selectedTags}
-                                onChange={handleTagChange}
-                                allowCustomTags={true}
-                            />
-                        </div>
-                        <div className="flex-1">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                <Folder className="h-4 w-4 inline mr-1"/>
-                                Folder
-                            </label>
-                            <FolderSelector
-                                selectedFolder={selectedFolder}
-                                onChange={handleFolderChange}
-                            />
-                        </div>
-                    </div>
+                <Divider sx={{ my: 3 }} />
 
-                    <div className="flex justify-end gap-3">
-                        {
-                            prompt.type === PromptType.LOCAL_TEMPLATE && (
-                                <Button onClick={handleDeleteItem}
-                                        variant={'danger'}
-                                        icon={<Trash className="h-4 w-4 mx-1"/>}>
-                                    Delete
-                                </Button>
-                            )
-                        }
+                <Grid container spacing={3} sx={{ mb: 3 }}>
+                    <Grid item xs={12} md={6}>
+                        <Typography variant="subtitle2" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                            Tags
+                        </Typography>
+                        <TagSelector
+                            availableTags={tags}
+                            selectedTags={selectedTags}
+                            onChange={handleTagChange}
+                            allowCustomTags={true}
+                        />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                        <Typography variant="subtitle2" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                            Folder
+                        </Typography>
+                        <FolderSelector
+                            selectedFolder={selectedFolder}
+                            onChange={handleFolderChange}
+                        />
+                    </Grid>
+                </Grid>
+
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+                    {prompt.type === PromptType.LOCAL_TEMPLATE && (
                         <Button
-                            onClick={handleCopy}
-                            icon={<Copy className="h-4 w-4 mx-1"/>}>
-                            Copy
+                            onClick={handleDeleteItem}
+                            variant="contained"
+                            color="error"
+                            startIcon={<Trash size={16} />}
+                        >
+                            Delete
                         </Button>
-                        {
-                            !isSaved && (
-                                <Button
-                                    onClick={handleSave}
-                                    variant={'primary'}
-                                    icon={<Save className="h-4 w-4 mx-2"/>}>
-                                    Save
-                                </Button>
-                            )
-                        }
-                    </div>
-                </div>
-            </div>
-        </div>
+                    )}
+                    <Button
+                        onClick={handleCopy}
+                        variant="outlined"
+                        color="primary"
+                        startIcon={<Copy size={16} />}
+                    >
+                        Copy
+                    </Button>
+                    {!isSaved && (
+                        <Button
+                            onClick={handleSave}
+                            variant="contained"
+                            color="primary"
+                            startIcon={<Save size={16} />}
+                        >
+                            Save
+                        </Button>
+                    )}
+                </Box>
+            </Paper>
+        </Container>
     );
 };
 

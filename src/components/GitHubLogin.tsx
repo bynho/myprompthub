@@ -1,7 +1,21 @@
 import React, { useState } from 'react';
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  Collapse,
+  Link,
+  List,
+  ListItem,
+  ListItemText,
+  Paper,
+  TextField,
+  Typography
+} from '@mui/material';
 import { AlertCircle, ExternalLink } from 'lucide-react';
 import githubService from '../services/secureGithubService';
-import {SiGithub} from "@icons-pack/react-simple-icons";
+import { SiGithub } from "@icons-pack/react-simple-icons";
 
 interface GitHubLoginProps {
   onLoginSuccess?: () => void;
@@ -13,7 +27,7 @@ const GitHubLogin: React.FC<GitHubLoginProps> = ({ onLoginSuccess, onLogout }) =
   const [showTokenInput, setShowTokenInput] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  
+
   const isLoggedIn = githubService.isAuthenticated();
 
   const handleLogin = async () => {
@@ -53,95 +67,123 @@ const GitHubLogin: React.FC<GitHubLoginProps> = ({ onLoginSuccess, onLogout }) =
 
   if (isLoggedIn) {
     return (
-      <div className="flex flex-row items-center space-x-2">
-        <button
-          onClick={handleLogout}
-          className="flex items-center px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50"
-        >
-          <SiGithub className="h-4 w-4 mr-2" />
-          Logout
-        </button>
-      </div>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Button
+              onClick={handleLogout}
+              variant="outlined"
+              startIcon={<SiGithub size={16} />}
+          >
+            Logout
+          </Button>
+        </Box>
     );
   }
 
   return (
-    <div className="space-y-3">
-      {!showTokenInput ? (
-        <button
-          onClick={() => setShowTokenInput(true)}
-          className="flex items-center px-3 py-2 text-sm bg-gray-800 text-white rounded-md hover:bg-gray-700"
-        >
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {!showTokenInput ? (
+            <Button
+                onClick={() => setShowTokenInput(true)}
+                variant="contained"
+                color="inherit"
+                startIcon={<SiGithub size={16} />}
+                sx={{
+                  bgcolor: '#24292e',
+                  color: '#fff',
+                  '&:hover': { bgcolor: '#373e47' }
+                }}
+            >
+              Login with GitHub
+            </Button>
+        ) : (
+            <Paper sx={{ p: 3, border: 1, borderColor: 'divider' }}>
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="subtitle1" fontWeight="medium" sx={{ mb: 1 }}>
+                  How to create a GitHub Personal Access Token:
+                </Typography>
+                <List dense sx={{ pl: 2 }}>
+                  <ListItem sx={{ display: 'list-item', listStyleType: 'decimal' }}>
+                    <ListItemText primary="Go to your GitHub account settings" />
+                  </ListItem>
+                  <ListItem sx={{ display: 'list-item', listStyleType: 'decimal' }}>
+                    <ListItemText primary={<>Select <strong>Developer settings</strong> from the sidebar</>} />
+                  </ListItem>
+                  <ListItem sx={{ display: 'list-item', listStyleType: 'decimal' }}>
+                    <ListItemText primary={<>Click on <strong>Personal access tokens</strong> → <strong>Tokens (classic)</strong></>} />
+                  </ListItem>
+                  <ListItem sx={{ display: 'list-item', listStyleType: 'decimal' }}>
+                    <ListItemText primary={<>Click <strong>Generate new token</strong> → <strong>Generate new token (classic)</strong></>} />
+                  </ListItem>
+                  <ListItem sx={{ display: 'list-item', listStyleType: 'decimal' }}>
+                    <ListItemText primary="Give your token a descriptive name" />
+                  </ListItem>
+                  <ListItem sx={{ display: 'list-item', listStyleType: 'decimal' }}>
+                    <ListItemText primary={<>Select the <strong>gist</strong> scope (this is the only permission needed)</>} />
+                  </ListItem>
+                  <ListItem sx={{ display: 'list-item', listStyleType: 'decimal' }}>
+                    <ListItemText primary={<>Click <strong>Generate token</strong> at the bottom of the page</>} />
+                  </ListItem>
+                  <ListItem sx={{ display: 'list-item', listStyleType: 'decimal' }}>
+                    <ListItemText primary="Copy the generated token (you won't be able to see it again!)" />
+                  </ListItem>
+                </List>
+                <Link
+                    href="https://github.com/settings/tokens/new?scopes=gist&description=MyPromptHub"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      mt: 1,
+                      color: 'primary.main'
+                    }}
+                >
+                  Create token directly <ExternalLink size={14} style={{ marginLeft: 4 }} />
+                </Link>
+              </Box>
 
-          <SiGithub className="h-4 w-4 mr-2" />
-          Login with GitHub
-        </button>
-      ) : (
-        <div className="space-y-3 p-4 border border-gray-200 rounded-md">
-          <div className="text-sm text-gray-600 space-y-2">
-            <p className="font-medium">How to create a GitHub Personal Access Token:</p>
-            <ol className="list-decimal pl-5 space-y-1">
-              <li>Go to your GitHub account settings</li>
-              <li>Select <strong>Developer settings</strong> from the sidebar</li>
-              <li>Click on <strong>Personal access tokens</strong> → <strong>Tokens (classic)</strong></li>
-              <li>Click <strong>Generate new token</strong> → <strong>Generate new token (classic)</strong></li>
-              <li>Give your token a descriptive name</li>
-              <li>Select the <strong>gist</strong> scope (this is the only permission needed)</li>
-              <li>Click <strong>Generate token</strong> at the bottom of the page</li>
-              <li>Copy the generated token (you won't be able to see it again!)</li>
-            </ol>
-            <p className="mt-2">
-              <a 
-                href="https://github.com/settings/tokens/new?scopes=gist&description=MyPromptHub" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-800 flex items-center"
-              >
-                Create token directly <ExternalLink className="h-3 w-3 ml-1" />
-              </a>
-            </p>
-          </div>
-          
-          <div>
-            <input
-              type="password"
-              value={token}
-              onChange={(e) => setToken(e.target.value)}
-              placeholder="GitHub Personal Access Token"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          
-          {error && (
-            <div className="p-2 bg-red-50 text-red-700 rounded-md flex items-center text-sm">
-              <AlertCircle className="h-4 w-4 mr-1" />
-              {error}
-            </div>
-          )}
-          
-          <div className="flex space-x-2">
-            <button
-              onClick={() => setShowTokenInput(false)}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleLogin}
-              disabled={loading}
-              className="flex-1 px-3 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex justify-center items-center"
-            >
-              {loading ? (
-                <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></span>
-              ) : (
-                <SiGithub className="h-4 w-4 mr-2" />
-              )}
-              Login
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+              <TextField
+                  type="password"
+                  value={token}
+                  onChange={(e) => setToken(e.target.value)}
+                  placeholder="GitHub Personal Access Token"
+                  fullWidth
+                  size="small"
+                  sx={{ mb: 2 }}
+              />
+
+              <Collapse in={!!error}>
+                <Alert
+                    severity="error"
+                    icon={<AlertCircle size={16} />}
+                    sx={{ mb: 2 }}
+                >
+                  {error}
+                </Alert>
+              </Collapse>
+
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <Button
+                    onClick={() => setShowTokenInput(false)}
+                    variant="outlined"
+                    fullWidth
+                >
+                  Cancel
+                </Button>
+                <Button
+                    onClick={handleLogin}
+                    disabled={loading}
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                    startIcon={loading ? <CircularProgress size={16} color="inherit" /> : <SiGithub size={16} />}
+                >
+                  Login
+                </Button>
+              </Box>
+            </Paper>
+        )}
+      </Box>
   );
 };
 

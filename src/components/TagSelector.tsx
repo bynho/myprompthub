@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
+import {
+  Autocomplete,
+  Chip,
+  ListItem,
+  Paper,
+  Popper,
+  TextField,
+  Typography
+} from '@mui/material';
 import { Plus, Tag as TagIcon } from 'lucide-react';
-import Tag from './Tag';
 
 interface TagSelectorProps {
   availableTags?: string[];
@@ -16,7 +24,6 @@ const TagSelector: React.FC<TagSelectorProps> = ({
                                                    allowCustomTags = true
                                                  }) => {
   const [inputValue, setInputValue] = useState('');
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleTagClick = (tag: string) => {
     if (selectedTags.includes(tag)) {
@@ -25,26 +32,20 @@ const TagSelector: React.FC<TagSelectorProps> = ({
       onChange([...selectedTags, tag]);
     }
     setInputValue('');
-    setIsDropdownOpen(false);
   };
 
   const handleRemoveTag = (tag: string) => {
     onChange(selectedTags.filter(t => t !== tag));
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-    setIsDropdownOpen(true);
-  };
-
-  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && inputValue.trim() && allowCustomTags) {
-      e.preventDefault();
+  const handleInputKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter' && inputValue.trim() && allowCustomTags) {
+      event.preventDefault();
       if (!selectedTags.includes(inputValue.trim())) {
         onChange([...selectedTags, inputValue.trim()]);
       }
       setInputValue('');
-    } else if (e.key === 'Backspace' && !inputValue && selectedTags.length > 0) {
+    } else if (event.key === 'Backspace' && !inputValue && selectedTags.length > 0) {
       handleRemoveTag(selectedTags[selectedTags.length - 1]);
     }
   };
@@ -58,60 +59,85 @@ const TagSelector: React.FC<TagSelectorProps> = ({
       : [];
 
   return (
-      <div className="relative">
-        {/* Container with fixed min-height to avoid layout shift */}
-        <div className="flex flex-wrap items-center gap-2 px-3 py-2 border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500 min-h-[42px]">
-          {selectedTags.map(tag => (
-              <Tag
-                  key={tag}
-                  icon={<TagIcon className="h-3 w-3" />}
-                  onRemove={() => handleRemoveTag(tag)}
+      <Autocomplete
+          multiple
+          freeSolo
+          id="tags-selector"
+          options={filteredTags}
+          value={selectedTags}
+          inputValue={inputValue}
+          onInputChange={(event, newInputValue) => {
+            setInputValue(newInputValue);
+          }}
+          onChange={(event, newValue) => {
+            onChange(newValue as string[]);
+          }}
+          renderTags={(value, getTagProps) =>
+              value.map((option, index) => (
+                  <Chip
+                      label={option}
+                      size="small"
+                      icon={<TagIcon size={14} />}
+                      {...getTagProps({ index })}
+                      sx={{
+                        height: 24,
+                        mr: 0.5,
+                        mb: 0.5,
+                        bgcolor: 'rgba(75, 85, 99, 0.1)',
+                        color: 'text.secondary'
+                      }}
+                  />
+              ))
+          }
+          renderInput={(params) => (
+              <TextField
+                  {...params}
+                  variant="outlined"
+                  placeholder={selectedTags.length > 0 ? '' : 'Select or type tags...'}
+                  size="small"
+                  onKeyDown={handleInputKeyDown}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      pl: 1,
+                      minHeight: 42,
+                      flexWrap: 'wrap',
+                      alignItems: 'center'
+                    }
+                  }}
+              />
+          )}
+          renderOption={(props, option) => (
+              <ListItem {...props}>
+                <TagIcon size={14} style={{ marginRight: 8 }} />
+                <Typography variant="body2">{option}</Typography>
+              </ListItem>
+          )}
+          noOptionsText={
+            inputValue && allowCustomTags ? (
+                <ListItem
+                    button
+                    onClick={() => handleTagClick(inputValue)}
+                    sx={{ py: 0.5, px: 1 }}
+                >
+                  <Plus size={14} style={{ marginRight: 8 }} />
+                  <Typography variant="body2">Create "{inputValue}"</Typography>
+                </ListItem>
+            ) : (
+                <Typography variant="body2" sx={{ p: 1 }}>No matching tags</Typography>
+            )
+          }
+          PopperComponent={(props) => (
+              <Popper
+                  {...props}
+                  placement="bottom-start"
+                  sx={{ width: props.anchorEl?.clientWidth }}
               >
-                {tag}
-              </Tag>
-          ))}
-          <div className="flex-1 min-w-[100px]">
-            <input
-                type="text"
-                value={inputValue}
-                onChange={handleInputChange}
-                onKeyDown={handleInputKeyDown}
-                onFocus={() => setIsDropdownOpen(true)}
-                onBlur={() => setTimeout(() => setIsDropdownOpen(false), 200)}
-                placeholder={selectedTags.length > 0 ? '' : 'Select or type tags...'}
-                className="w-full border-none focus:ring-0 p-0 text-sm leading-5"
-            />
-          </div>
-        </div>
-        {isDropdownOpen && (inputValue || filteredTags.length > 0) && (
-            <div className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base overflow-auto focus:outline-none sm:text-sm">
-              {filteredTags.length > 0 ? (
-                  <ul className="divide-y divide-gray-100">
-                    {filteredTags.map(tag => (
-                        <li
-                            key={tag}
-                            onClick={() => handleTagClick(tag)}
-                            className="px-4 py-2 flex items-center text-sm hover:bg-gray-100 cursor-pointer"
-                        >
-                          <TagIcon className="h-4 w-4 mr-2 text-gray-500" />
-                          {tag}
-                        </li>
-                    ))}
-                  </ul>
-              ) : inputValue && allowCustomTags ? (
-                  <div
-                      onClick={() => handleTagClick(inputValue)}
-                      className="px-4 py-2 flex items-center text-sm hover:bg-gray-100 cursor-pointer"
-                  >
-                    <Plus className="h-4 w-4 mr-2 text-gray-500" />
-                    Create "{inputValue}"
-                  </div>
-              ) : (
-                  <div className="px-4 py-2 text-sm text-gray-500">No matching tags</div>
-              )}
-            </div>
-        )}
-      </div>
+                <Paper elevation={3} sx={{ mt: 0.5 }}>
+                  {props.children}
+                </Paper>
+              </Popper>
+          )}
+      />
   );
 };
 

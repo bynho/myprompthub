@@ -1,34 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Check, Database, AlertCircle, Loader } from 'lucide-react';
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  Container,
+  Paper,
+  Typography,
+  Stack
+} from '@mui/material';
+import { ArrowLeft, Check, Database, AlertCircle } from 'lucide-react';
 import GitHubSync from '../components/GitHubSync';
-// import analyticsService from '../services/analyticsService';
 import { isSupabaseConfigured, checkSupabaseConnection } from '../services/supabaseClient';
 
 const SettingsPage: React.FC = () => {
   const navigate = useNavigate();
-  // const [saved, setSaved] = useState(false);
   const [isSupabaseEnabled] = useState<boolean>(isSupabaseConfigured());
   const [isSupabaseConnected, setIsSupabaseConnected] = useState<boolean | null>(null);
   const [checkingConnection, setCheckingConnection] = useState<boolean>(false);
-
-  // const [gaEnabled, setGaEnabled] = useState(() => {
-  //   try {
-  //     const preferences = JSON.parse(localStorage.getItem('analytics-preferences') || '{}');
-  //     return preferences.ga !== undefined ? preferences.ga : true;
-  //   } catch {
-  //     return true;
-  //   }
-  // });
-  //
-  // const [clarityEnabled, setClarityEnabled] = useState(() => {
-  //   try {
-  //     const preferences = JSON.parse(localStorage.getItem('analytics-preferences') || '{}');
-  //     return preferences.clarity !== undefined ? preferences.clarity : true;
-  //   } catch {
-  //     return true;
-  //   }
-  // });
 
   useEffect(() => {
     const checkConnection = async () => {
@@ -51,181 +41,168 @@ const SettingsPage: React.FC = () => {
     checkConnection();
   }, [isSupabaseEnabled]);
 
-  // const handleSaveAnalytics = () => {
-  //   const preferences = { ga: gaEnabled, clarity: clarityEnabled };
-  //   localStorage.setItem('analytics-preferences', JSON.stringify(preferences));
-  //   analyticsService.init(preferences);
-  //   setSaved(true);
-  //   setTimeout(() => setSaved(false), 3000);
-  //   if (gaEnabled) {
-  //     analyticsService.event('Settings', 'update_analytics_preferences',
-  //         `GA: ${gaEnabled}, Clarity: ${clarityEnabled}`);
-  //   }
-  // };
-
   return (
-      <div className="max-w-3xl mx-auto py-8 px-4">
-        <button
+      <Container maxWidth="md" sx={{ py: 4 }}>
+        <Button
             onClick={() => navigate(-1)}
-            className="flex items-center text-indigo-600 hover:text-indigo-800 mb-6"
+            startIcon={<ArrowLeft size={18} />}
+            sx={{ color: 'primary.main', mb: 3 }}
         >
-          <ArrowLeft className="h-4 w-4 mr-1" />
           Back
-        </button>
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Settings</h1>
-        </div>
-        <div className="space-y-6">
+        </Button>
+
+        <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 3 }}>
+          Settings
+        </Typography>
+
+        <Stack spacing={3}>
           {/* GitHub Integration */}
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <Paper sx={{ p: 3 }}>
             <GitHubSync />
-          </div>
+          </Paper>
 
           {/* Supabase Integration */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-              <Database className="h-5 w-5 mr-2 text-blue-500" />
-              Supabase Integration
-            </h2>
-            <div className="my-4 p-3 bg-yellow-50 text-yellow-800 rounded-md text-sm">
-              <p className="flex items-start">
-                <AlertCircle className="h-4 w-4 mr-2 mt-0.5" />
-                <span>
-                  Your saved prompts / own prompt templates are not stored by us.  They are stored locally on your browser and optionally synced with Github
-                </span>
-              </p>
-            </div>
-            <div className="mb-4">
-              <p className="text-gray-600 mb-2">
-                Supabase provides cloud storage for default prompts and translations.
-              </p>
+          <Paper sx={{ p: 3 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <Database size={20} style={{ color: '#3b82f6', marginRight: 8 }} />
+              <Typography variant="h6">
+                Supabase Integration
+              </Typography>
+            </Box>
 
-              <div className="flex items-center mt-4">
-                <span className="text-sm font-medium text-gray-700 mr-2">Supabase Configuration:</span>
+            <Alert severity="warning" sx={{ mb: 3 }}>
+              <Typography variant="body2">
+                Your saved prompts / own prompt templates are not stored by us. They are stored locally on your browser and optionally synced with Github
+              </Typography>
+            </Alert>
+
+            <Typography variant="body2" color="text.secondary" paragraph>
+              Supabase provides cloud storage for default prompts and translations.
+            </Typography>
+
+            <Box sx={{ my: 3 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                <Typography variant="body2" fontWeight="medium" sx={{ mr: 1 }}>
+                  Supabase Configuration:
+                </Typography>
                 {isSupabaseEnabled ? (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                  <Check className="h-3 w-3 mr-1" />
-                  Configured
-                </span>
+                    <Box
+                        component="span"
+                        sx={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          px: 1,
+                          py: 0.5,
+                          borderRadius: '1rem',
+                          fontSize: '0.75rem',
+                          bgcolor: 'rgba(16, 185, 129, 0.1)',
+                          color: 'rgb(5, 150, 105)',
+                        }}
+                    >
+                      <Check size={12} style={{ marginRight: 4 }} />
+                      Configured
+                    </Box>
                 ) : (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                  <AlertCircle className="h-3 w-3 mr-1" />
-                  Not Configured
-                </span>
+                    <Box
+                        component="span"
+                        sx={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          px: 1,
+                          py: 0.5,
+                          borderRadius: '1rem',
+                          fontSize: '0.75rem',
+                          bgcolor: 'rgba(239, 68, 68, 0.1)',
+                          color: 'rgb(220, 38, 38)',
+                        }}
+                    >
+                      <AlertCircle size={12} style={{ marginRight: 4 }} />
+                      Not Configured
+                    </Box>
                 )}
-              </div>
+              </Box>
 
-              <div className="flex items-center mt-2">
-                <span className="text-sm font-medium text-gray-700 mr-2">Connection Status:</span>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Typography variant="body2" fontWeight="medium" sx={{ mr: 1 }}>
+                  Connection Status:
+                </Typography>
                 {checkingConnection ? (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                  <Loader className="h-3 w-3 mr-1 animate-spin" />
-                  Checking...
-                </span>
+                    <Box
+                        component="span"
+                        sx={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          px: 1,
+                          py: 0.5,
+                          borderRadius: '1rem',
+                          fontSize: '0.75rem',
+                          bgcolor: 'rgba(156, 163, 175, 0.1)',
+                          color: 'text.secondary',
+                        }}
+                    >
+                      <CircularProgress size={12} sx={{ mr: 0.5 }} />
+                      Checking...
+                    </Box>
                 ) : isSupabaseConnected ? (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                  <Check className="h-3 w-3 mr-1" />
-                  Connected
-                </span>
+                    <Box
+                        component="span"
+                        sx={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          px: 1,
+                          py: 0.5,
+                          borderRadius: '1rem',
+                          fontSize: '0.75rem',
+                          bgcolor: 'rgba(16, 185, 129, 0.1)',
+                          color: 'rgb(5, 150, 105)',
+                        }}
+                    >
+                      <Check size={12} style={{ marginRight: 4 }} />
+                      Connected
+                    </Box>
                 ) : (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                  <AlertCircle className="h-3 w-3 mr-1" />
-                  Not Connected
-                </span>
+                    <Box
+                        component="span"
+                        sx={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          px: 1,
+                          py: 0.5,
+                          borderRadius: '1rem',
+                          fontSize: '0.75rem',
+                          bgcolor: 'rgba(239, 68, 68, 0.1)',
+                          color: 'rgb(220, 38, 38)',
+                        }}
+                    >
+                      <AlertCircle size={12} style={{ marginRight: 4 }} />
+                      Not Connected
+                    </Box>
                 )}
-              </div>
-            </div>
+              </Box>
+            </Box>
 
             {isSupabaseEnabled && !isSupabaseConnected && !checkingConnection && (
-                <div className="mt-4 p-3 bg-yellow-50 text-yellow-800 rounded-md text-sm">
-                  <p className="flex items-start">
-                    <AlertCircle className="h-4 w-4 mr-2 mt-0.5" />
-                    <span>
-                  Supabase is configured but not connected. Make sure your database is set up correctly
-                  and your API keys are valid. Run <code className="bg-yellow-100 px-1 py-0.5 rounded text-xs">npm run setup-db</code> to
-                  create the necessary tables and policies.
-                </span>
-                  </p>
-                </div>
+                <Alert severity="warning" sx={{ mt: 2 }}>
+                  <Typography variant="body2">
+                    Supabase is configured but not connected. Make sure your database is set up correctly
+                    and your API keys are valid. Run <Box component="code" sx={{ bgcolor: 'rgba(251, 191, 36, 0.1)', px: 0.5, py: 0.25, borderRadius: 0.5, fontSize: '0.8rem' }}>npm run setup-db</Box> to
+                    create the necessary tables and policies.
+                  </Typography>
+                </Alert>
             )}
 
             {!isSupabaseEnabled && (
-                <div className="mt-4 p-3 bg-blue-50 text-blue-800 rounded-md text-sm">
-                  <p className="flex items-start">
-                    <AlertCircle className="h-4 w-4 mr-2 mt-0.5" />
-                    <span>
-                  To enable Supabase integration, create a <code className="bg-blue-100 px-1 py-0.5 rounded text-xs">.env</code> file
-                  with your Supabase URL and anon key. You can use the <code className="bg-blue-100 px-1 py-0.5 rounded text-xs">.env.example</code> file
-                  as a template.
-                </span>
-                  </p>
-                </div>
+                <Alert severity="info" sx={{ mt: 2 }}>
+                  <Typography variant="body2">
+                    To enable Supabase integration, create a <Box component="code" sx={{ bgcolor: 'rgba(59, 130, 246, 0.1)', px: 0.5, py: 0.25, borderRadius: 0.5, fontSize: '0.8rem' }}>.env</Box> file
+                    with your Supabase URL and anon key. You can use the <Box component="code" sx={{ bgcolor: 'rgba(59, 130, 246, 0.1)', px: 0.5, py: 0.25, borderRadius: 0.5, fontSize: '0.8rem' }}>.env.example</Box> file
+                    as a template.
+                  </Typography>
+                </Alert>
             )}
-          </div>
-
-          {/* Analytics Settings */}
-          {/*<div className="bg-white rounded-lg shadow-md p-6">*/}
-          {/*  <h2 className="text-lg font-semibold text-gray-900 mb-4">Analytics Settings</h2>*/}
-          {/*  <div className="mb-6">*/}
-          {/*    <div className="flex items-start mb-4">*/}
-          {/*      <div className="flex items-center h-5">*/}
-          {/*        <input*/}
-          {/*            id="ga-analytics"*/}
-          {/*            type="checkbox"*/}
-          {/*            checked={gaEnabled}*/}
-          {/*            onChange={(e) => setGaEnabled(e.target.checked)}*/}
-          {/*            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"*/}
-          {/*        />*/}
-          {/*      </div>*/}
-          {/*      <div className="ml-3 text-sm">*/}
-          {/*        <label htmlFor="ga-analytics" className="font-medium text-gray-700">Google Analytics</label>*/}
-          {/*        <p className="text-gray-500">*/}
-          {/*          Helps us understand how you use the application, which features are popular, and how we can improve your experience.*/}
-          {/*        </p>*/}
-          {/*      </div>*/}
-          {/*    </div>*/}
-
-          {/*    <div className="flex items-start mb-4">*/}
-          {/*      <div className="flex items-center h-5">*/}
-          {/*        <input*/}
-          {/*            id="clarity-analytics"*/}
-          {/*            type="checkbox"*/}
-          {/*            checked={clarityEnabled}*/}
-          {/*            onChange={(e) => setClarityEnabled(e.target.checked)}*/}
-          {/*            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"*/}
-          {/*        />*/}
-          {/*      </div>*/}
-          {/*      <div className="ml-3 text-sm">*/}
-          {/*        <label htmlFor="clarity-analytics" className="font-medium text-gray-700">Microsoft Clarity</label>*/}
-          {/*        <p className="text-gray-500">*/}
-          {/*          Provides heatmaps and session recordings to help us understand how you interact with the interface and identify usability issues.*/}
-          {/*        </p>*/}
-          {/*      </div>*/}
-          {/*    </div>*/}
-          {/*  </div>*/}
-
-          {/*  <div className="flex items-center justify-between">*/}
-          {/*    <div className="text-sm text-gray-500">*/}
-          {/*      <AlertCircle className="h-4 w-4 inline mr-1" />*/}
-          {/*      Changes will take effect after saving and refreshing the page.*/}
-          {/*    </div>*/}
-          {/*    <button*/}
-          {/*        onClick={handleSaveAnalytics}*/}
-          {/*        className="btn btn-primary flex items-center"*/}
-          {/*    >*/}
-          {/*      <Save className="h-4 w-4 mr-1" />*/}
-          {/*      Save Preferences*/}
-          {/*    </button>*/}
-          {/*  </div>*/}
-
-          {/*  {saved && (*/}
-          {/*      <div className="mt-4 p-2 bg-green-100 text-green-800 rounded-md text-sm">*/}
-          {/*        Settings saved successfully!*/}
-          {/*      </div>*/}
-          {/*  )}*/}
-          {/*</div>*/}
-        </div>
-      </div>
+          </Paper>
+        </Stack>
+      </Container>
   );
 };
 

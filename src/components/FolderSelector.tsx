@@ -1,4 +1,19 @@
 import React, { useState } from 'react';
+import {
+  Box,
+  Button,
+  ClickAwayListener,
+  IconButton,
+  InputAdornment,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Paper,
+  Popper,
+  TextField,
+  Typography
+} from '@mui/material';
 import { FolderPlus, X } from 'lucide-react';
 import { usePrompts } from '../contexts/PromptContext';
 
@@ -8,13 +23,14 @@ interface FolderSelectorProps {
 }
 
 const FolderSelector: React.FC<FolderSelectorProps> = ({
-  selectedFolder,
-  onChange,
-}) => {
+                                                         selectedFolder,
+                                                         onChange,
+                                                       }) => {
   const { folders, createFolder } = usePrompts();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleFolderSelect = (folderId: string | undefined) => {
     onChange(folderId);
@@ -29,84 +45,150 @@ const FolderSelector: React.FC<FolderSelectorProps> = ({
     }
   };
 
+  const handleButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleClose = () => {
+    setIsDropdownOpen(false);
+  };
+
   const selectedFolderName = selectedFolder
-    ? folders.find((f) => f.id === selectedFolder)?.name
-    : 'Select folder';
+      ? folders.find((f) => f.id === selectedFolder)?.name
+      : 'Select folder';
 
   return (
-    <div className="relative">
-      <button
-        type="button"
-        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-        className="flex items-center justify-between w-full px-3 py-2 text-sm border border-gray-300 rounded-md bg-white shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-      >
-        <div className="flex items-center">
-          <span className="truncate">{selectedFolderName}</span>
-        </div>
-      </button>
+      <Box sx={{ position: 'relative', width: '100%' }}>
+        <Button
+            variant="outlined"
+            onClick={handleButtonClick}
+            fullWidth
+            sx={{
+              justifyContent: 'flex-start',
+              textAlign: 'left',
+              py: 1,
+              px: 1.5,
+              color: 'text.primary',
+              bgcolor: 'background.paper'
+            }}
+        >
+          <Typography
+              variant="body2"
+              noWrap
+              sx={{
+                flexGrow: 1,
+                textAlign: 'left',
+                color: selectedFolder ? 'text.primary' : 'text.secondary'
+              }}
+          >
+            {selectedFolderName}
+          </Typography>
+        </Button>
 
-      {isDropdownOpen && (
-        <div className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base overflow-auto focus:outline-none sm:text-sm">
-          <ul className="divide-y divide-gray-100">
-            <li
-              onClick={() => handleFolderSelect(undefined)}
-              className="px-4 py-2 flex items-center text-sm hover:bg-gray-100 cursor-pointer"
+        <Popper
+            open={isDropdownOpen}
+            anchorEl={anchorEl}
+            placement="bottom-start"
+            style={{ width: anchorEl?.offsetWidth, zIndex: 1300 }}
+        >
+          <ClickAwayListener onClickAway={handleClose}>
+            <Paper
+                elevation={3}
+                sx={{
+                  mt: 0.5,
+                  maxHeight: 250,
+                  overflow: 'auto'
+                }}
             >
-              <span className="text-gray-500">No folder</span>
-            </li>
-
-            {folders.map((folder) => (
-              <li
-                key={folder.id}
-                onClick={() => handleFolderSelect(folder.id)}
-                className={`px-4 py-2 flex items-center text-sm hover:bg-gray-100 cursor-pointer ${
-                  selectedFolder === folder.id ? 'bg-indigo-50' : ''
-                }`}
-              >
-                {folder.name}
-              </li>
-            ))}
-
-            {isCreatingFolder ? (
-              <li className="px-4 py-2">
-                <div className="flex items-center">
-                  <input
-                    type="text"
-                    value={newFolderName}
-                    onChange={(e) => setNewFolderName(e.target.value)}
-                    placeholder="Folder name"
-                    className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-                    autoFocus
+              <List sx={{ p: 0 }}>
+                <ListItemButton
+                    onClick={() => handleFolderSelect(undefined)}
+                    selected={!selectedFolder}
+                >
+                  <ListItemText
+                      primary="No folder"
+                      primaryTypographyProps={{
+                        color: 'text.secondary',
+                        variant: 'body2'
+                      }}
                   />
-                  <button
-                    type="button"
-                    onClick={handleCreateFolder}
-                    className="ml-2 p-1 text-indigo-600 hover:text-indigo-800 focus:outline-none"
-                  >
-                    <FolderPlus className="h-4 w-4" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setIsCreatingFolder(false)}
-                    className="ml-1 p-1 text-gray-500 hover:text-gray-700 focus:outline-none"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              </li>
-            ) : (
-              <li
-                onClick={() => setIsCreatingFolder(true)}
-                className="px-4 py-2 flex items-center text-sm text-indigo-600 hover:bg-gray-100 cursor-pointer"
-              >
-                <FolderPlus className="h-4 w-4 mr-2" />
-                Create new folder
-              </li>
-            )}
-          </ul>
-        </div>
-      )}
-    </div>
+                </ListItemButton>
+
+                {folders.map((folder) => (
+                    <ListItemButton
+                        key={folder.id}
+                        onClick={() => handleFolderSelect(folder.id)}
+                        selected={selectedFolder === folder.id}
+                        sx={{
+                          '&.Mui-selected': {
+                            backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                          }
+                        }}
+                    >
+                      <ListItemText
+                          primary={folder.name}
+                          primaryTypographyProps={{ variant: 'body2' }}
+                      />
+                    </ListItemButton>
+                ))}
+
+                {isCreatingFolder ? (
+                    <ListItem sx={{ py: 1, px: 2 }}>
+                      <TextField
+                          fullWidth
+                          size="small"
+                          value={newFolderName}
+                          onChange={(e) => setNewFolderName(e.target.value)}
+                          placeholder="Folder name"
+                          autoFocus
+                          InputProps={{
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                  <IconButton
+                                      edge="end"
+                                      size="small"
+                                      onClick={handleCreateFolder}
+                                      color="primary"
+                                  >
+                                    <FolderPlus size={16} />
+                                  </IconButton>
+                                  <IconButton
+                                      edge="end"
+                                      size="small"
+                                      onClick={() => setIsCreatingFolder(false)}
+                                      sx={{ ml: 0.5 }}
+                                  >
+                                    <X size={16} />
+                                  </IconButton>
+                                </InputAdornment>
+                            ),
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleCreateFolder();
+                          }}
+                      />
+                    </ListItem>
+                ) : (
+                    <ListItemButton
+                        onClick={() => setIsCreatingFolder(true)}
+                        sx={{ color: 'primary.main' }}
+                    >
+                      <FolderPlus size={16} style={{ marginRight: 8 }} />
+                      <ListItemText
+                          primary="Create new folder"
+                          primaryTypographyProps={{
+                            variant: 'body2',
+                            color: 'primary'
+                          }}
+                      />
+                    </ListItemButton>
+                )}
+              </List>
+            </Paper>
+          </ClickAwayListener>
+        </Popper>
+      </Box>
   );
 };
 

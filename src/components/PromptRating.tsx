@@ -1,4 +1,5 @@
 import React from 'react';
+import { Box, IconButton, Typography } from '@mui/material';
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import { usePromptContext } from '../contexts/PromptContext';
 
@@ -9,10 +10,10 @@ interface PromptRatingProps {
 }
 
 const PromptRating: React.FC<PromptRatingProps> = ({
-  promptId,
-  positiveCount = 0,
-  negativeCount = 0
-}) => {
+                                                     promptId,
+                                                     positiveCount = 0,
+                                                     negativeCount = 0
+                                                   }) => {
   const { ratePrompt, isSupabaseEnabled } = usePromptContext();
 
   const handleRate = async (rating: boolean) => {
@@ -20,45 +21,57 @@ const PromptRating: React.FC<PromptRatingProps> = ({
   };
 
   return (
-    <div className="flex items-center space-x-4">
-      <div className="flex items-center">
-        <button
-          onClick={() => handleRate(true)}
-          className={`p-1 rounded-full ${
-            positiveCount > negativeCount
-              ? 'bg-green-100 text-green-600'
-              : 'text-gray-400 hover:text-green-600 hover:bg-green-50'
-          }`}
-          title="Rate Positive"
-          aria-label="Rate Positive"
-        >
-          <ThumbsUp className="h-5 w-5" />
-        </button>
-        <span className="ml-1 text-sm text-gray-600">{positiveCount}</span>
-      </div>
-      
-      <div className="flex items-center">
-        <button
-          onClick={() => handleRate(false)}
-          className={`p-1 rounded-full ${
-            positiveCount < negativeCount
-              ? 'bg-red-100 text-red-600'
-              : 'text-gray-400 hover:text-red-600 hover:bg-red-50'
-          }`}
-          title="Rate Negative"
-          aria-label="Rate Negative"
-        >
-          <ThumbsDown className="h-5 w-5" />
-        </button>
-        <span className="ml-1 text-sm text-gray-600">{negativeCount}</span>
-      </div>
-      
-      {!isSupabaseEnabled && (
-        <span className="text-xs text-gray-500 italic">
-          Ratings stored locally only
-        </span>
-      )}
-    </div>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <IconButton
+              onClick={() => handleRate(true)}
+              sx={{
+                p: 0.5,
+                borderRadius: '50%',
+                color: positiveCount > negativeCount ? 'success.main' : 'text.disabled',
+                bgcolor: positiveCount > negativeCount ? 'rgba(16, 185, 129, 0.1)' : 'transparent',
+                '&:hover': {
+                  bgcolor: 'rgba(16, 185, 129, 0.1)',
+                  color: 'success.main'
+                }
+              }}
+              aria-label="Rate Positive"
+          >
+            <ThumbsUp size={20} />
+          </IconButton>
+          <Typography variant="body2" color="text.secondary" sx={{ ml: 0.5 }}>
+            {positiveCount}
+          </Typography>
+        </Box>
+
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <IconButton
+              onClick={() => handleRate(false)}
+              sx={{
+                p: 0.5,
+                borderRadius: '50%',
+                color: positiveCount < negativeCount ? 'error.main' : 'text.disabled',
+                bgcolor: positiveCount < negativeCount ? 'rgba(239, 68, 68, 0.1)' : 'transparent',
+                '&:hover': {
+                  bgcolor: 'rgba(239, 68, 68, 0.1)',
+                  color: 'error.main'
+                }
+              }}
+              aria-label="Rate Negative"
+          >
+            <ThumbsDown size={20} />
+          </IconButton>
+          <Typography variant="body2" color="text.secondary" sx={{ ml: 0.5 }}>
+            {negativeCount}
+          </Typography>
+        </Box>
+
+        {!isSupabaseEnabled && (
+            <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+              Ratings stored locally only
+            </Typography>
+        )}
+      </Box>
   );
 };
 

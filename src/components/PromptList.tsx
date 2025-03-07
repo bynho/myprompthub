@@ -1,4 +1,5 @@
 import React from 'react';
+import { Box, Grid, Paper, Skeleton, Typography } from '@mui/material';
 import { Prompt } from '../types';
 import PromptCard from './PromptCard';
 
@@ -10,40 +11,42 @@ interface PromptListProps {
 const PromptList: React.FC<PromptListProps> = ({ prompts, loading = false }) => {
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[...Array(6)].map((_, index) => (
-          <div key={index} className="card animate-pulse">
-            <div className="p-5">
-              <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
-              <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-5/6 mb-4"></div>
-              <div className="h-3 bg-gray-200 rounded w-1/3 mb-3"></div>
-              <div className="flex gap-2">
-                <div className="h-5 bg-gray-200 rounded w-16"></div>
-                <div className="h-5 bg-gray-200 rounded w-16"></div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+        <Grid container spacing={3}>
+          {[...Array(6)].map((_, index) => (
+              <Grid item xs={12} sm={6} md={4} key={index}>
+                <Paper sx={{ p: 2.5, height: '100%' }}>
+                  <Skeleton variant="rectangular" width="75%" height={28} sx={{ mb: 1 }} />
+                  <Skeleton variant="rectangular" width="25%" height={20} sx={{ mb: 2 }} />
+                  <Skeleton variant="rectangular" width="100%" height={20} sx={{ mb: 0.5 }} />
+                  <Skeleton variant="rectangular" width="85%" height={20} sx={{ mb: 2 }} />
+                  <Skeleton variant="rectangular" width="33%" height={16} sx={{ mb: 1.5 }} />
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Skeleton variant="rectangular" width={60} height={24} />
+                    <Skeleton variant="rectangular" width={60} height={24} />
+                  </Box>
+                </Paper>
+              </Grid>
+          ))}
+        </Grid>
     );
   }
 
   if (prompts.length === 0) {
     return (
-      <div className="text-center py-10">
-        <p className="text-gray-500">No prompts found</p>
-      </div>
+        <Box sx={{ textAlign: 'center', py: 5 }}>
+          <Typography color="text.secondary">No prompts found</Typography>
+        </Box>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {prompts.map(prompt => (
-        <PromptCard key={prompt.id} prompt={prompt} />
-      ))}
-    </div>
+      <Grid container spacing={3}>
+        {prompts.map(prompt => (
+            <Grid item xs={12} sm={6} md={4} key={prompt.id}>
+              <PromptCard prompt={prompt} />
+            </Grid>
+        ))}
+      </Grid>
   );
 };
 

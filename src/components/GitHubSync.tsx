@@ -1,10 +1,20 @@
-import React, {useEffect, useState} from 'react';
-import {AlertCircle, Check, ExternalLink, ImportIcon, RefreshCw} from 'lucide-react';
-import {usePromptContext} from '../contexts/PromptContext';
+import React, { useEffect, useState } from 'react';
+import {
+    Alert,
+    Box,
+    Button,
+    CircularProgress,
+    Collapse,
+    Link,
+    Paper,
+    Typography
+} from '@mui/material';
+import { AlertCircle, Check, ExternalLink, ImportIcon, RefreshCw } from 'lucide-react';
+import { usePromptContext } from '../contexts/PromptContext';
 import githubService from '../services/secureGithubService';
 import GitHubLogin from './GitHubLogin';
-import {useToast} from "../contexts/ToastContext.tsx";
-import {PromptType} from "../types";
+import { useToast } from "../contexts/ToastContext";
+import { PromptType } from "../types";
 
 interface GitHubSyncProps {
     hideInfo?: boolean
@@ -24,7 +34,7 @@ const GitHubSync: React.FC<GitHubSyncProps> = ({
     const [syncing, setSyncing] = useState(false);
     const [lastSynced, setLastSynced] = useState<string | null>(null);
     const [status, setStatus] = useState<{ success: boolean, message: string } | null>(null);
-    const {addToast} = useToast();
+    const { addToast } = useToast();
 
     const isLoggedIn = githubService.isAuthenticated();
     const hasGist = githubService.hasGist();
@@ -55,8 +65,7 @@ const GitHubSync: React.FC<GitHubSyncProps> = ({
                 duration: 5000
             });
         }
-
-    }, [status]);
+    }, [status, addToast]);
 
     const handleSync = async () => {
         if (!isLoggedIn) {
@@ -142,115 +151,123 @@ const GitHubSync: React.FC<GitHubSyncProps> = ({
     };
 
     return (
-        <div className="space-y-4">
-            {
-                !hideInfo && (
-                    <>
-                        <h3 className="text-lg font-medium text-gray-900">Sync with GitHub</h3>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            {!hideInfo && (
+                <>
+                    <Typography variant="h6" gutterBottom>
+                        Sync with GitHub
+                    </Typography>
 
-                        <div className="bg-gray-50 p-4 rounded-md border border-gray-200 mb-4">
-                            <h4 className="font-medium text-gray-800 mb-2">Why sync with GitHub?</h4>
-                            <p className="text-sm text-gray-600 mb-2">
-                                Syncing with GitHub allows you to:
-                            </p>
-                            <ul className="list-disc pl-5 text-sm text-gray-600 space-y-1 mb-3">
-                                <li>Back up your saved prompts and custom templates</li>
-                                <li>Access your prompts from different devices</li>
-                                <li>Share your prompt collection with others</li>
-                            </ul>
-                            <p className="text-sm text-gray-600">
-                                Your data is stored in a GitHub Gist (a simple way to share code snippets) under your GitHub
-                                account.
-                            </p>
-                        </div>
-                    </>
-                )
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            p: 3,
+                            bgcolor: 'rgba(249, 250, 251, 0.8)',
+                            border: 1,
+                            borderColor: 'divider',
+                            borderRadius: 1,
+                            mb: 2
+                        }}
+                    >
+                        <Typography variant="subtitle1" fontWeight="medium" gutterBottom>
+                            Why sync with GitHub?
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" paragraph>
+                            Syncing with GitHub allows you to:
+                        </Typography>
+                        <Box component="ul" sx={{ pl: 2, mb: 2 }}>
+                            <Box component="li" sx={{ mb: 0.5 }}>
+                                <Typography variant="body2" color="text.secondary">
+                                    Back up your saved prompts and custom templates
+                                </Typography>
+                            </Box>
+                            <Box component="li" sx={{ mb: 0.5 }}>
+                                <Typography variant="body2" color="text.secondary">
+                                    Access your prompts from different devices
+                                </Typography>
+                            </Box>
+                            <Box component="li" sx={{ mb: 0.5 }}>
+                                <Typography variant="body2" color="text.secondary">
+                                    Share your prompt collection with others
+                                </Typography>
+                            </Box>
+                        </Box>
+                        <Typography variant="body2" color="text.secondary">
+                            Your data is stored in a GitHub Gist (a simple way to share code snippets) under your GitHub account.
+                        </Typography>
+                    </Paper>
+                </>
+            )}
 
-            }
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {isLoggedIn && (
+                    <Link
+                        href={`https://gist.github.com/${githubService.getGistId()}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            fontSize: '0.875rem',
+                            color: 'primary.main'
+                        }}
+                    >
+                        View your Gist on GitHub <ExternalLink size={14} style={{ marginLeft: 4 }} />
+                    </Link>
+                )}
 
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        justifyContent: 'space-between',
+                        gap: 2
+                    }}
+                >
+                    <GitHubLogin onLoginSuccess={handleLoginSuccess} onLogout={handleLogoutSuccess} />
 
-            <div className="space-y-4">
-                {
-                    isLoggedIn && (
-                        <a
-                            href={`https://gist.github.com/${githubService.getGistId()}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
-                        >
-                            View your Gist on GitHub <ExternalLink className="h-3 w-3 ml-1"/>
-                        </a>
-                    )
-                }
-
-
-                <div className="flex flex-col sm:flex-row justify-between gap-2">
-
-                    <GitHubLogin onLoginSuccess={handleLoginSuccess} onLogout={handleLogoutSuccess}/>
-                    <div className="flex flex-row gap-2 items-start">
-                        {
-                            isLoggedIn && (
-                                <button
-                                    onClick={handleSync}
-                                    disabled={syncing}
-                                    className="flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                >
-                                    {syncing ? (
-                                        <span
-                                            className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></span>
-                                    ) : (
-                                        <RefreshCw className="h-4 w-4 mr-2"/>
-                                    )}
-                                    Sync with GitHub
-                                </button>
-                            )
-
-                        }
-                        {isLoggedIn && hasGist && (
-                            <>
-                                <button
-                                    onClick={handleImport}
-                                    disabled={syncing}
-                                    className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                >
-                                    {syncing ? (
-                                        <span
-                                            className="animate-spin h-4 w-4 border-2 border-gray-700 border-t-transparent rounded-full mr-2"></span>
-                                    ) : (
-                                        <ImportIcon className="h-4 w-4 mr-2"/>
-                                    )}
-                                    Import from GitHub
-                                </button>
-
-
-                            </>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                        {isLoggedIn && (
+                            <Button
+                                onClick={handleSync}
+                                disabled={syncing}
+                                variant="contained"
+                                color="primary"
+                                startIcon={syncing ? <CircularProgress size={16} color="inherit" /> : <RefreshCw size={16} />}
+                            >
+                                Sync with GitHub
+                            </Button>
                         )}
-                    </div>
 
-                </div>
+                        {isLoggedIn && hasGist && (
+                            <Button
+                                onClick={handleImport}
+                                disabled={syncing}
+                                variant="outlined"
+                                startIcon={syncing ? <CircularProgress size={16} color="inherit" /> : <ImportIcon size={16} />}
+                            >
+                                Import from GitHub
+                            </Button>
+                        )}
+                    </Box>
+                </Box>
 
                 {isLoggedIn && lastSynced && (
-                    <p className="text-sm text-gray-600">
+                    <Typography variant="caption" color="text.secondary">
                         Last synced: {new Date(lastSynced).toLocaleString()}
-                    </p>
+                    </Typography>
                 )}
 
-                {status && (
-                    <div className={`p-3 rounded-md text-sm flex items-start ${
-                        status.success ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
-                    }`}>
-                        {status.success ? (
-                            <Check className="h-4 w-4 mr-2 mt-0.5"/>
-                        ) : (
-                            <AlertCircle className="h-4 w-4 mr-2 mt-0.5"/>
-                        )}
-                        <span>{status.message}</span>
-                    </div>
-                )}
-
-            </div>
-
-        </div>
+                <Collapse in={!!status}>
+                    <Alert
+                        severity={status?.success ? 'success' : 'error'}
+                        icon={status?.success ? <Check size={16} /> : <AlertCircle size={16} />}
+                    >
+                        {status?.message}
+                    </Alert>
+                </Collapse>
+            </Box>
+        </Box>
     );
 };
 

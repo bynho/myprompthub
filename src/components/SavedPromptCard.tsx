@@ -1,16 +1,26 @@
 import React from 'react';
-import {Link} from 'react-router-dom';
-import {Calendar, Copy, Edit, Folder, Tag, Trash} from 'lucide-react';
-import {Prompt} from '../types';
-import {usePromptContext} from '../contexts/PromptContext';
+import { Link as RouterLink } from 'react-router-dom';
+import {
+    Box,
+    Card,
+    CardContent,
+    Chip,
+    IconButton,
+    Link,
+    Stack,
+    Typography
+} from '@mui/material';
+import { Calendar, Copy, Edit, Folder, Tag as TagIcon, Trash } from 'lucide-react';
+import { Prompt } from '../types';
+import { usePromptContext } from '../contexts/PromptContext';
 import analyticsService from '../services/analyticsService';
 
 interface SavedPromptCardProps {
     prompt: Prompt;
 }
 
-const SavedPromptCard: React.FC<SavedPromptCardProps> = ({prompt}) => {
-    const {removeSavedPrompt, copyToClipboard} = usePromptContext();
+const SavedPromptCard: React.FC<SavedPromptCardProps> = ({ prompt }) => {
+    const { removeSavedPrompt, copyToClipboard } = usePromptContext();
 
     const handleCopy = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -38,78 +48,139 @@ const SavedPromptCard: React.FC<SavedPromptCardProps> = ({prompt}) => {
     };
 
     return (
-        <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
-            <div className="p-5">
-                <div className="flex justify-between items-start mb-3">
+        <Card sx={{
+            height: '100%',
+            transition: 'all 0.2s',
+            '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: 3
+            }
+        }}>
+            <CardContent sx={{ p: 2.5, display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
                     <Link
+                        component={RouterLink}
                         to={`/prompt/${prompt.id}`}
-                        className="text-lg font-semibold text-gray-900 hover:text-blue-600 line-clamp-2"
                         onClick={handleCardClick}
+                        sx={{
+                            fontWeight: 600,
+                            color: 'text.primary',
+                            textDecoration: 'none',
+                            '&:hover': { color: 'primary.main' },
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                            mb: 1
+                        }}
+                        variant="h6"
                     >
                         {prompt.title}
                     </Link>
-                    <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
-            {prompt.category}
-          </span>
-                </div>
+                    <Chip
+                        label={prompt.category}
+                        size="small"
+                        sx={{
+                            bgcolor: 'rgba(59, 130, 246, 0.1)',
+                            color: 'rgb(37, 99, 235)',
+                            fontSize: '0.75rem'
+                        }}
+                    />
+                </Box>
 
-                <p className="text-gray-600 mb-4 line-clamp-3">{prompt.content}</p>
+                <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{
+                        mb: 2,
+                        display: '-webkit-box',
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
+                    }}
+                >
+                    {prompt.content}
+                </Typography>
 
-                <div className="flex flex-wrap gap-2 mb-4">
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
                     {prompt.folder && (
-                        <div className="flex items-center text-sm text-gray-500">
-                            <Folder className="h-4 w-4 mr-1"/>
-                            <span>{prompt.folder}</span>
-                        </div>
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <Folder size={16} style={{ marginRight: 4 }} />
+                            <Typography variant="caption" color="text.secondary">
+                                {prompt.folder}
+                            </Typography>
+                        </Box>
                     )}
 
                     {prompt.createdAt && (
-                        <div className="flex items-center text-sm text-gray-500">
-                            <Calendar className="h-4 w-4 mr-1"/>
-                            <span>{new Date(prompt.createdAt).toLocaleDateString()}</span>
-                        </div>
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <Calendar size={16} style={{ marginRight: 4 }} />
+                            <Typography variant="caption" color="text.secondary">
+                                {new Date(prompt.createdAt).toLocaleDateString()}
+                            </Typography>
+                        </Box>
                     )}
-                </div>
+                </Box>
 
                 {prompt.tags && prompt.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mb-4">
-                        <Tag className="h-4 w-4 text-gray-400"/>
+                    <Stack direction="row" spacing={0.5} flexWrap="wrap" sx={{ mb: 2 }}>
+                        <TagIcon size={16} style={{ color: '#9ca3af', marginTop: 4 }} />
                         {prompt.tags.map((tag, index) => (
-                            <span
+                            <Chip
                                 key={index}
-                                className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full"
-                            >
-                {tag}
-              </span>
+                                label={tag}
+                                size="small"
+                                sx={{
+                                    height: 24,
+                                    fontSize: '0.75rem',
+                                    bgcolor: 'rgba(75, 85, 99, 0.1)',
+                                    color: 'text.secondary',
+                                    mb: 0.5
+                                }}
+                            />
                         ))}
-                    </div>
+                    </Stack>
                 )}
 
-                <div className="flex justify-end gap-2 mt-2">
-                    <button
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 'auto' }}>
+                    <IconButton
                         onClick={handleCopy}
-                        className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                        size="small"
+                        sx={{
+                            color: 'text.secondary',
+                            '&:hover': { bgcolor: 'rgba(59, 130, 246, 0.1)', color: 'primary.main' }
+                        }}
                         title="Copy to clipboard"
                     >
-                        <Copy className="h-5 w-5"/>
-                    </button>
-                    <Link
+                        <Copy size={20} />
+                    </IconButton>
+                    <IconButton
+                        component={RouterLink}
                         to={`/prompt/${prompt.id}`}
-                        className="p-2 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-full transition-colors"
+                        size="small"
+                        sx={{
+                            color: 'text.secondary',
+                            '&:hover': { bgcolor: 'rgba(16, 185, 129, 0.1)', color: 'success.main' }
+                        }}
                         title="Edit"
                     >
-                        <Edit className="h-5 w-5"/>
-                    </Link>
-                    <button
+                        <Edit size={20} />
+                    </IconButton>
+                    <IconButton
                         onClick={handleDelete}
-                        className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                        size="small"
+                        sx={{
+                            color: 'text.secondary',
+                            '&:hover': { bgcolor: 'rgba(239, 68, 68, 0.1)', color: 'error.main' }
+                        }}
                         title="Delete"
                     >
-                        <Trash className="h-5 w-5"/>
-                    </button>
-                </div>
-            </div>
-        </div>
+                        <Trash size={20} />
+                    </IconButton>
+                </Box>
+            </CardContent>
+        </Card>
     );
 };
 

@@ -1,6 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Search, Save, Home, Menu, X, Settings } from 'lucide-react';
+import React, { useState } from 'react';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
+import {
+  AppBar,
+  Box,
+  Container,
+  Drawer,
+  IconButton,
+  Link,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Toolbar,
+  Typography,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
+import {Search, Save, Home, Menu as MenuIcon, Settings, XIcon} from 'lucide-react';
 import analyticsService from '../services/analyticsService';
 
 interface LayoutProps {
@@ -10,9 +26,11 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   // Track navigation events
-  useEffect(() => {
+  React.useEffect(() => {
     const pageName = getPageName(location.pathname);
     analyticsService.event('Navigation', 'page_view', pageName);
   }, [location]);
@@ -32,8 +50,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
     analyticsService.event(
-      'Navigation',
-      isMenuOpen ? 'close_menu' : 'open_menu'
+        'Navigation',
+        isMenuOpen ? 'close_menu' : 'open_menu'
     );
   };
 
@@ -42,143 +60,128 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     analyticsService.event('Navigation', 'nav_click', navItem);
   };
 
+  const isActive = (path: string) => {
+    return getPageName(location.pathname) === path;
+  };
+
+  const navItems = [
+    { name: 'Home', path: '/', icon: <Home size={20} /> },
+    { name: 'Browse', path: '/browse', icon: <Search size={20} /> },
+    { name: 'Saved', path: '/saved', icon: <Save size={20} /> },
+    { name: 'Settings', path: '/settings', icon: <Settings size={20} /> }
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="bg-white shadow-sm">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex justify-between items-center py-4">
-            <Link
-              to="/"
-              className="flex items-center"
-              onClick={() => handleNavClick('logo')}
-            >
-              <Search className="h-6 w-6 text-blue-600 mr-2" />
-              <span className="text-xl font-bold text-gray-900">
-                MyPromptHub
-              </span>
-            </Link>
+      <Box sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh',
+        bgcolor: 'background.default'
+      }}>
+        <AppBar position="static" color="default" elevation={1} sx={{ bgcolor: 'background.paper' }}>
+          <Container maxWidth="lg">
+            <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 1, sm: 2 } }}>
+              <Link
+                  component={RouterLink}
+                  to="/"
+                  underline="none"
+                  onClick={() => handleNavClick('logo')}
+                  sx={{ display: 'flex', alignItems: 'center', color: 'text.primary' }}
+              >
+                <Search size={24} color={theme.palette.primary.main} style={{ marginRight: 8 }} />
+                <Typography variant="h6" fontWeight="bold">
+                  MyPromptHub
+                </Typography>
+              </Link>
 
-            <nav className="hidden md:flex items-center space-x-6">
-              <Link
-                to="/"
-                className={`flex items-center text-sm font-medium ${
-                  getPageName(location.pathname) === 'Home'
-                    ? 'text-blue-600'
-                    : 'text-gray-700 hover:text-blue-600'
-                }`}
-                onClick={() => handleNavClick('home')}
-              >
-                <Home className="h-5 w-5 mr-1" />
-                Home
-              </Link>
-              <Link
-                to="/browse"
-                className={`flex items-center text-sm font-medium ${
-                  getPageName(location.pathname) === 'Browse'
-                    ? 'text-blue-600'
-                    : 'text-gray-700 hover:text-blue-600'
-                }`}
-                onClick={() => handleNavClick('browse')}
-              >
-                <Search className="h-5 w-5 mr-1" />
-                Browse
-              </Link>
-              <Link
-                to="/saved"
-                className={`flex items-center text-sm font-medium ${
-                  getPageName(location.pathname) === 'Saved'
-                    ? 'text-blue-600'
-                    : 'text-gray-700 hover:text-blue-600'
-                }`}
-                onClick={() => handleNavClick('saved')}
-              >
-                <Save className="h-5 w-5 mr-1" />
-                Saved
-              </Link>
-              <Link 
-                to="/settings"
-                className={`flex items-center text-sm font-medium ${
-                  location.pathname.includes('/settings')
-                    ? 'text-blue-600' 
-                    : 'text-gray-700 hover:text-blue-600'
-                }`}
-                onClick={() => handleNavClick('settings')}
-              >
-                <Settings className="h-5 w-5 mr-1" />
-                Settings
-              </Link>
-            </nav>
-
-            <button
-              className="md:hidden p-2 rounded-md text-gray-700 hover:text-blue-600 hover:bg-gray-100 focus:outline-none"
-              onClick={toggleMenu}
-            >
-              {isMenuOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
+              {/* Desktop navigation */}
+              {!isMobile && (
+                  <Box component="nav" sx={{ display: 'flex', gap: 3 }}>
+                    {navItems.map((item) => (
+                        <Link
+                            key={item.name}
+                            component={RouterLink}
+                            to={item.path}
+                            underline="none"
+                            onClick={() => handleNavClick(item.name.toLowerCase())}
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              fontWeight: 500,
+                              py: 1,
+                              px: 1,
+                              borderRadius: 1,
+                              color: isActive(item.name) ? 'primary.main' : 'text.secondary',
+                              '&:hover': {
+                                color: 'primary.main',
+                                bgcolor: 'background.default'
+                              }
+                            }}
+                        >
+                          {React.cloneElement(item.icon, { style: { marginRight: 4 } })}
+                          {item.name}
+                        </Link>
+                    ))}
+                  </Box>
               )}
-            </button>
-          </div>
-        </div>
-      </header>
 
-      {/* Mobile menu */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-white shadow-md">
-          <nav className="flex flex-col px-4 py-2">
-            <Link
-              to="/"
-              className={`flex items-center py-3 text-sm font-medium ${
-                getPageName(location.pathname) === 'Home' ? 'text-blue-600' : 'text-gray-700'
-              }`}
-              onClick={() => handleNavClick('home_mobile')}
-            >
-              <Home className="h-5 w-5 mr-2" />
-              Home
-            </Link>
-            <Link
-              to="/browse"
-              className={`flex items-center py-3 text-sm font-medium ${
-                getPageName(location.pathname) === 'Browse'
-                  ? 'text-blue-600'
-                  : 'text-gray-700'
-              }`}
-              onClick={() => handleNavClick('browse_mobile')}
-            >
-              <Search className="h-5 w-5 mr-2" />
-              Browse
-            </Link>
-            <Link
-              to="/saved"
-              className={`flex items-center py-3 text-sm font-medium ${
-                getPageName(location.pathname) === 'Saved'
-                  ? 'text-blue-600'
-                  : 'text-gray-700'
-              }`}
-              onClick={() => handleNavClick('saved_mobile')}
-            >
-              <Save className="h-5 w-5 mr-2" />
-              Saved
-            </Link>
-            <Link
-              to="/settings"
-              className={`flex items-center py-3 text-sm font-medium ${
-                location.pathname.includes('/settings')
-                  ? 'text-blue-600'
-                  : 'text-gray-700'
-              }`}
-              onClick={() => handleNavClick('settings_mobile')}
-            >
-              <Settings className="h-5 w-5 mr-2" />
-              Settings
-            </Link>
-          </nav>
-        </div>
-      )}
+              {/* Mobile menu button */}
+              {isMobile && (
+                  <IconButton
+                      edge="end"
+                      color="inherit"
+                      aria-label="menu"
+                      onClick={toggleMenu}
+                      sx={{ p: 1 }}
+                  >
+                    {isMenuOpen ? <XIcon size={24} /> : <MenuIcon size={24} />}
+                  </IconButton>
+              )}
+            </Toolbar>
+          </Container>
+        </AppBar>
 
-      <main className="flex-1">{children}</main>
-    </div>
+        {/* Mobile drawer menu */}
+        <Drawer
+            anchor="top"
+            open={isMobile && isMenuOpen}
+            onClose={() => setIsMenuOpen(false)}
+            sx={{
+              '& .MuiDrawer-paper': {
+                boxSizing: 'border-box',
+                top: '56px',
+                height: 'auto',
+                boxShadow: 3
+              }
+            }}
+        >
+          <List sx={{ py: 1 }}>
+            {navItems.map((item) => (
+                <ListItem
+                    key={item.name}
+                    component={RouterLink}
+                    to={item.path}
+                    onClick={() => handleNavClick(`${item.name.toLowerCase()}_mobile`)}
+                    sx={{
+                      color: isActive(item.name) ? 'primary.main' : 'text.secondary',
+                      '&:hover': {
+                        bgcolor: 'background.default'
+                      }
+                    }}
+                >
+                  <ListItemIcon sx={{ minWidth: 40, color: 'inherit' }}>
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText primary={item.name} />
+                </ListItem>
+            ))}
+          </List>
+        </Drawer>
+
+        <Box component="main" sx={{ flexGrow: 1 }}>
+          {children}
+        </Box>
+      </Box>
   );
 };
 

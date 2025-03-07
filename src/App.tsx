@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { ThemeProvider, CssBaseline } from '@mui/material';
 import { PromptProvider } from './contexts/PromptContext';
 import { ToastProvider, registerErrorToastHandler, useToast } from './contexts/ToastContext';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -13,6 +14,7 @@ import AnalyticsSettings from './components/AnalyticsSettings';
 import SettingsPage from './pages/SettingsPage';
 import NotFoundPage from './pages/NotFoundPage';
 import analyticsService from './services/analyticsService';
+import theme from './theme';
 
 // Initialize analytics service
 analyticsService.init();
@@ -43,31 +45,34 @@ const ErrorHandlerRegistration: React.FC = () => {
 // Main application component
 function App() {
   return (
-      <ErrorBoundary>
-        <ToastProvider>
-          <Router>
-            <ErrorHandlerRegistration />
-            <AnalyticsTracker />
-            <PromptProvider>
-              <Layout>
-                <ErrorBoundary>
-                  <Routes>
-                    <Route path="/" element={<HomePage />} />
-                    <Route path="/browse" element={<BrowsePromptsPage />} />
-                    <Route path="/prompt/:id" element={<PromptDetailPage />} />
-                    <Route path="/saved" element={<SavedPromptsPage />} />
-                    <Route path="/create" element={<CreatePromptPage />} />
-                    <Route path="/create/:id" element={<CreatePromptPage />} />
-                    <Route path="/settings/analytics" element={<AnalyticsSettings />} />
-                    <Route path="/settings" element={<SettingsPage />} />
-                    <Route path="*" element={<NotFoundPage />} />
-                  </Routes>
-                </ErrorBoundary>
-              </Layout>
-            </PromptProvider>
-          </Router>
-        </ToastProvider>
-      </ErrorBoundary>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <ErrorBoundary>
+          <ToastProvider>
+            <Router>
+              <ErrorHandlerRegistration />
+              <AnalyticsTracker />
+              <PromptProvider>
+                <Layout>
+                  <ErrorBoundary>
+                    <Routes>
+                      <Route path="/" element={<HomePage />} />
+                      <Route path="/browse" element={<BrowsePromptsPage />} />
+                      <Route path="/prompt/:id" element={<PromptDetailPage />} />
+                      <Route path="/saved" element={<SavedPromptsPage />} />
+                      <Route path="/create" element={<CreatePromptPage />} />
+                      <Route path="/create/:id" element={<CreatePromptPage />} />
+                      <Route path="/settings/analytics" element={<AnalyticsSettings />} />
+                      <Route path="/settings" element={<SettingsPage />} />
+                      <Route path="*" element={<NotFoundPage />} />
+                    </Routes>
+                  </ErrorBoundary>
+                </Layout>
+              </PromptProvider>
+            </Router>
+          </ToastProvider>
+        </ErrorBoundary>
+      </ThemeProvider>
   );
 }
 

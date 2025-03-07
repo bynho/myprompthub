@@ -1,4 +1,13 @@
 import React from 'react';
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+  Box
+} from '@mui/material';
 import { Variable } from '../types';
 
 interface VariableInputProps {
@@ -8,63 +17,87 @@ interface VariableInputProps {
 }
 
 const VariableInput: React.FC<VariableInputProps> = ({ variable, value, onChange }) => {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    onChange(e.target.value);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | { name?: string; value: unknown }>) => {
+    onChange(e.target.value as string);
   };
 
   const renderInput = () => {
+    const commonProps = {
+      id: `variable-${variable.id}`,
+      value,
+      onChange: handleChange,
+      placeholder: variable.placeholder || '',
+      fullWidth: true,
+      size: 'small' as const,
+      sx: { mb: 1 }
+    };
+
     switch (variable.type) {
       case 'textarea':
         return (
-          <textarea
-            id={`variable-${variable.id}`}
-            value={value}
-            onChange={handleChange}
-            placeholder={variable.placeholder || ''}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            rows={4}
-          />
+            <TextField
+                {...commonProps}
+                multiline
+                rows={4}
+            />
         );
       case 'select':
         return (
-          <select
-            id={`variable-${variable.id}`}
-            value={value}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="">Select an option</option>
-            {variable.options?.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
+            <FormControl fullWidth size="small" sx={{ mb: 1 }}>
+              <InputLabel id={`variable-select-${variable.id}-label`}>
+                {variable.placeholder || 'Select an option'}
+              </InputLabel>
+              <Select
+                  labelId={`variable-select-${variable.id}-label`}
+                  id={`variable-${variable.id}`}
+                  value={value}
+                  onChange={handleChange}
+                  label={variable.placeholder || 'Select an option'}
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                {variable.options?.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
         );
       default:
         return (
-          <input
-            type={variable.type || 'text'}
-            id={`variable-${variable.id}`}
-            value={value}
-            onChange={handleChange}
-            placeholder={variable.placeholder || ''}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          />
+            <TextField
+                {...commonProps}
+                type={variable.type || 'text'}
+            />
         );
     }
   };
 
   return (
-    <div className="space-y-2">
-      <label htmlFor={`variable-${variable.id}`} className="block text-sm font-medium text-gray-700">
-        {variable.name}
+      <Box sx={{ mb: 2 }}>
+        <Typography
+            variant="subtitle2"
+            component="label"
+            htmlFor={`variable-${variable.id}`}
+            gutterBottom
+        >
+          {variable.name}
+        </Typography>
+
         {variable.description && (
-          <span className="ml-1 text-xs text-gray-500">({variable.description})</span>
+            <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: 'block', mb: 1 }}
+            >
+              {variable.description}
+            </Typography>
         )}
-      </label>
-      {renderInput()}
-    </div>
+
+        {renderInput()}
+      </Box>
   );
 };
 

@@ -1,4 +1,5 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
+import { Box, Button, Typography, Paper } from '@mui/material';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 import errorService from '../services/errorService';
 
@@ -62,27 +63,55 @@ class ErrorBoundary extends Component<Props, State> {
 
             // Default fallback UI
             return (
-                <div className="p-4 bg-red-50 rounded-md border border-red-200 text-red-800">
-                    <div className="flex items-start">
-                        <AlertTriangle className="h-5 w-5 mr-2 mt-0.5 text-red-600" />
-                        <div>
-                            <h3 className="text-lg font-medium">Something went wrong</h3>
-                            <div className="mt-2 text-sm">
-                                <p>An error occurred in this component:</p>
-                                <p className="font-mono bg-red-100 p-2 rounded my-2 overflow-auto max-h-32">
+                <Paper
+                    elevation={0}
+                    sx={{
+                        p: 2,
+                        backgroundColor: 'error.light',
+                        color: 'error.dark',
+                        borderRadius: 1,
+                        border: 1,
+                        borderColor: 'error.main'
+                    }}
+                >
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
+                        <AlertTriangle sx={{ mr: 1, mt: 0.5, color: 'error.main' }} />
+                        <Box>
+                            <Typography variant="h6" component="h3" sx={{ mb: 1 }}>
+                                Something went wrong
+                            </Typography>
+                            <Box sx={{ mt: 2 }}>
+                                <Typography variant="body2">
+                                    An error occurred in this component:
+                                </Typography>
+                                <Box
+                                    component="pre"
+                                    sx={{
+                                        fontFamily: 'monospace',
+                                        p: 1,
+                                        my: 1,
+                                        bgcolor: 'rgba(239, 68, 68, 0.2)',
+                                        borderRadius: 1,
+                                        overflow: 'auto',
+                                        maxHeight: '8rem'
+                                    }}
+                                >
                                     {this.state.error?.message || 'Unknown error'}
-                                </p>
-                            </div>
-                            <button
+                                </Box>
+                            </Box>
+                            <Button
                                 onClick={this.resetErrorBoundary}
-                                className="mt-3 flex items-center px-3 py-1.5 text-sm font-medium bg-white border border-red-300 rounded-md hover:bg-red-50"
+                                startIcon={<RefreshCw size={16} />}
+                                variant="outlined"
+                                color="error"
+                                size="small"
+                                sx={{ mt: 2 }}
                             >
-                                <RefreshCw className="h-4 w-4 mr-1" />
                                 Try Again
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                            </Button>
+                        </Box>
+                    </Box>
+                </Paper>
             );
         }
 
